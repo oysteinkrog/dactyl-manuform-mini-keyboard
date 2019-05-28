@@ -629,7 +629,7 @@
 
 (def trrs-holder-size [6.2 10 4]) ; trrs jack PJ-320A
 (def trrs-holder-hole-size [6.2 10 6]) ; trrs jack PJ-320A
-(def trrs-holder-position  (map + usb-holder-position [-15.6 0 0]))
+(def trrs-holder-position  (map + usb-holder-position [-14.6 0 0]))
 (def trrs-holder-thickness 2)
 (def trrs-holder-thickness-2x (* 2 trrs-holder-thickness))
 (def trrs-holder
