@@ -630,6 +630,7 @@
 (def trrs-holder-size [6.2 10 4]) ; trrs jack PJ-320A
 (def trrs-holder-hole-size [6.2 10 6]) ; trrs jack PJ-320A
 (def trrs-holder-position  (map + usb-holder-position [-14.6 0 0]))
+(def trrs-holder-insert-position  (map + usb-holder-position [-14.6 0 0]))
 (def trrs-holder-thickness 2)
 (def trrs-holder-thickness-2x (* 2 trrs-holder-thickness))
 (def trrs-holder
@@ -644,6 +645,18 @@
     (->> (binding [*fn* 30] (cylinder 3.25 20))) ; 5mm trrs jack
     (rotate (deg2rad  90) [1 0 0])
     (translate [(first trrs-holder-position) (+ (second trrs-holder-position) (/ (+ (second trrs-holder-size) trrs-holder-thickness) 2)) (+ 3 (/ (+ (last trrs-holder-size) trrs-holder-thickness) 2))])) ;1.5 padding
+
+  ; rectangular trrs holder
+   (->> (apply cube trrs-holder-hole-size) (translate [(first trrs-holder-position) (+ (/ trrs-holder-thickness -2) (second trrs-holder-position)) (+ (/ (last trrs-holder-hole-size) 2) trrs-holder-thickness)]))))
+
+(def trrs-holder-hole-insert
+  (union
+
+  ; circle trrs hole
+   (->>
+    (->> (binding [*fn* 30] (cylinder 4.75 4))) 
+    (rotate (deg2rad  90) [1 0 0])
+    (translate [(first trrs-holder-insert-position) (+ (second trrs-holder-insert-position) (/ (+ (second trrs-holder-size) trrs-holder-thickness) 2)) (+ 3 (/ (+ (last trrs-holder-size) trrs-holder-thickness) 2))])) ;1.5 padding
 
   ; rectangular trrs holder
    (->> (apply cube trrs-holder-hole-size) (translate [(first trrs-holder-position) (+ (/ trrs-holder-thickness -2) (second trrs-holder-position)) (+ (/ (last trrs-holder-hole-size) 2) trrs-holder-thickness)]))))
@@ -734,6 +747,7 @@
                                usb-holder-space
                                usb-jack
                                trrs-holder-hole
+                               trrs-holder-hole-insert
                                screw-insert-holes))
                   (translate [0 0 -20] (cube 350 350 40))))
 
