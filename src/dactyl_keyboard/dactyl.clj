@@ -118,7 +118,7 @@
                            (with-fn 8))
         friction-hole-right (translate [5 0 0] friction-hole)
         friction-hole-left (translate [-5 0 0] friction-hole)
-        hotswap-base-shape (->> (cube 19 6.2 3)
+        hotswap-base-shape (->> (cube 19 6.2 3.5)
                                 (translate [0 4 -2.6]))
         hotswap-holder (difference swap-holder
                                    main-axis-hole
@@ -128,8 +128,7 @@
                                    minus-hole-mirrored
                                    friction-hole-left
                                    friction-hole-right
-                                   hotswap-base-shape
-                                   #_(mirror [-1 0 0] hotswap-base))]
+                                   hotswap-base-shape)]
     (difference (union plate-half
                        (->> plate-half
                             (mirror [1 0 0])
@@ -142,42 +141,43 @@
 
 (def sa-length 18.25)
 (def sa-double-length 37.5)
-(def sa-cap {1 (let [bl2 (/ 18.5 2)
-                     m (/ 17 2)
-                     key-cap (hull (->> (polygon [[bl2 bl2] [bl2 (- bl2)] [(- bl2) (- bl2)] [(- bl2) bl2]])
-                                        (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 0.05]))
-                                   (->> (polygon [[m m] [m (- m)] [(- m) (- m)] [(- m) m]])
-                                        (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 6]))
-                                   (->> (polygon [[6 6] [6 -6] [-6 -6] [-6 6]])
-                                        (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 12])))]
-                 (->> key-cap
-                      (translate [0 0 (+ 5 plate-thickness)])
-                      (color [220/255 163/255 163/255 1])))
-             2 (let [bl2 sa-length
-                     bw2 (/ 18.25 2)
-                     key-cap (hull (->> (polygon [[bw2 bl2] [bw2 (- bl2)] [(- bw2) (- bl2)] [(- bw2) bl2]])
-                                        (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 0.05]))
-                                   (->> (polygon [[6 16] [6 -16] [-6 -16] [-6 16]])
-                                        (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 12])))]
-                 (->> key-cap
-                      (translate [0 0 (+ 5 plate-thickness)])
-                      (color [127/255 159/255 127/255 1])))
-             1.5 (let [bl2 (/ 18.25 2)
-                       bw2 (/ 27.94 2)
-                       key-cap (hull (->> (polygon [[bw2 bl2] [bw2 (- bl2)] [(- bw2) (- bl2)] [(- bw2) bl2]])
-                                          (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                          (translate [0 0 0.05]))
-                                     (->> (polygon [[11 6] [-11 6] [-11 -6] [11 -6]])
-                                          (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                          (translate [0 0 12])))]
-                   (->> key-cap
-                        (translate [0 0 (+ 5 plate-thickness)])
-                        (color [240/255 223/255 175/255 1])))})
+(def sa-cap
+  {1 (let [bl2 (/ 18.5 2)
+           m (/ 17 2)
+           key-cap (hull (->> (polygon [[bl2 bl2] [bl2 (- bl2)] [(- bl2) (- bl2)] [(- bl2) bl2]])
+                              (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                              (translate [0 0 0.05]))
+                         (->> (polygon [[m m] [m (- m)] [(- m) (- m)] [(- m) m]])
+                              (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                              (translate [0 0 6]))
+                         (->> (polygon [[6 6] [6 -6] [-6 -6] [-6 6]])
+                              (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                              (translate [0 0 12])))]
+       (->> key-cap
+            (translate [0 0 (+ 5 plate-thickness)])
+            (color [220/255 163/255 163/255 1])))
+   2 (let [bl2 sa-length
+           bw2 (/ 18.25 2)
+           key-cap (hull (->> (polygon [[bw2 bl2] [bw2 (- bl2)] [(- bw2) (- bl2)] [(- bw2) bl2]])
+                              (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                              (translate [0 0 0.05]))
+                         (->> (polygon [[6 16] [6 -16] [-6 -16] [-6 16]])
+                              (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                              (translate [0 0 12])))]
+       (->> key-cap
+            (translate [0 0 (+ 5 plate-thickness)])
+            (color [127/255 159/255 127/255 1])))
+   1.5 (let [bl2 (/ 18.25 2)
+             bw2 (/ 27.94 2)
+             key-cap (hull (->> (polygon [[bw2 bl2] [bw2 (- bl2)] [(- bw2) (- bl2)] [(- bw2) bl2]])
+                                (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                                (translate [0 0 0.05]))
+                           (->> (polygon [[11 6] [-11 6] [-11 -6] [11 -6]])
+                                (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                                (translate [0 0 12])))]
+         (->> key-cap
+              (translate [0 0 (+ 5 plate-thickness)])
+              (color [240/255 223/255 175/255 1])))})
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Placement Functions ;;
@@ -671,30 +671,37 @@
         shift-left    (= column 0)
         shift-up      (and (not (or shift-right shift-left)) (= row 0))
         shift-down    (and (not (or shift-right shift-left)) (>= row lastrow))
-        position      (if shift-up     (key-position column row (map + (wall-locate2  0  1) [0 (/ mount-height 2) 0]))
-                          (if shift-down  (key-position column row (map - (wall-locate2  0 -1) [0 (/ mount-height 2) 0]))
-                              (if shift-left (map + (left-key-position row 0) (wall-locate3 -1 0))
-                                  (key-position column row (map + (wall-locate2  1  0) [(/ mount-width 2) 0 0])))))]
+        position      (if shift-up
+                        (key-position column row (map + (wall-locate2  0  1) [0 (/ mount-height 2) 0]))
+                        (if shift-down
+                          (key-position column row (map - (wall-locate2  0 -1) [0 (/ mount-height 2) 0]))
+                          (if shift-left
+                            (map + (left-key-position row 0) (wall-locate3 -1 0))
+                            (key-position column row (map + (wall-locate2  1  0) [(/ mount-width 2) 0 0])))))]
     (->> (screw-insert-shape bottom-radius top-radius height)
          (translate (map + offset [(first position) (second position) (/ height 2)])))))
 
 (defn screw-insert-all-shapes [bottom-radius top-radius height]
-  (union (screw-insert 0 0         bottom-radius top-radius height [11 10 0])
-         (screw-insert 0 lastrow   bottom-radius top-radius height [0 0 0])
-         (screw-insert lastcol lastrow  bottom-radius top-radius height [0 12 0])
-         (screw-insert lastcol 0         bottom-radius top-radius height [2 9 0])
-         (screw-insert 1 lastrow         bottom-radius top-radius height [0 -16 0])))
+  (union (screw-insert 0 0         bottom-radius top-radius height [12 11 0])
+         (screw-insert 0 lastrow   bottom-radius top-radius height [-2 0 0])
+         (screw-insert 4 cornerrow bottom-radius top-radius height [-6 -10 0])))
 
 ; Hole Depth Y: 4.4
-(def screw-insert-height 4)
+(def screw-insert-height 5)
 
 ; Hole Diameter C: 4.1-4.4
-(def screw-insert-bottom-radius (/ 4.4 2))
-(def screw-insert-top-radius (/ 4.4 2))
-(def screw-insert-holes  (screw-insert-all-shapes screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+(def screw-insert-bottom-radius (/ 3 2))
+(def screw-insert-top-radius (/ 3 2))
+(def screw-insert-holes 
+  (screw-insert-all-shapes screw-insert-bottom-radius
+                           screw-insert-top-radius
+                           screw-insert-height))
 
 ; Wall Thickness W:\t1.65
-(def screw-insert-outers (screw-insert-all-shapes (+ screw-insert-bottom-radius 1.65) (+ screw-insert-top-radius 1.65) (+ screw-insert-height 1.5)))
+(def screw-insert-outers
+  (screw-insert-all-shapes (+ screw-insert-bottom-radius 1.65)
+                           (+ screw-insert-top-radius 1.65)
+                           (+ screw-insert-height 1.5)))
 (def screw-insert-screw-holes  (screw-insert-all-shapes 1.7 1.7 350))
 
 (def pinky-connectors
@@ -731,12 +738,15 @@
     thumb
     thumb-connectors
     (difference (union case-walls
+                       screw-insert-outers
                        pro-micro-holder
-                       usb-holder-holder)
+                       usb-holder-holder
+                       trrs-holder)
                 usb-holder-space
                 usb-jack
-                rj9-space)
-    rj9-holder)
+                trrs-holder-hole
+                trrs-holder-hole-insert
+                screw-insert-holes))
    (translate [0 0 -20] (cube 350 350 40))))
 
 (spit "things/single-plate.scad"
@@ -765,7 +775,6 @@
 
         (translate [0 0 -20] (cube 350 350 40)))))
 
-#_
 (spit "things/right-plate.scad"
       (write-scad
        (cut
