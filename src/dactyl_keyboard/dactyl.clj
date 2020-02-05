@@ -118,25 +118,22 @@
                            (with-fn 8))
         friction-hole-right (translate [5 0 0] friction-hole)
         friction-hole-left (translate [-5 0 0] friction-hole)
-        ;hotswap-base-shape (->> (cube 19 6.2 3.5)
-                                ;(translate [0 4 -2.6]))
-        ;hotswap-holder (difference swap-holder
-                                   ;main-axis-hole
-                                   ;plus-hole
-                                   ;minus-hole
-                                   ;plus-hole-mirrored
-                                   ;minus-hole-mirrored
-                                   ;friction-hole-left
-                                   ;friction-hole-right
-                                   ;hotswap-base-shape)
-        ]
-    ;(difference (union plate-half
-                       ;(->> plate-half
-                            ;(mirror [1 0 0])
-                            ;(mirror [0 1 0]))
-                       ;hotswap-holder))
-    )
-  )
+        hotswap-base-shape (->> (cube 19 6.2 3.5)
+                                (translate [0 4 -2.6]))
+        hotswap-holder (difference swap-holder
+                                   main-axis-hole
+                                   plus-hole
+                                   minus-hole
+                                   plus-hole-mirrored
+                                   minus-hole-mirrored
+                                   friction-hole-left
+                                   friction-hole-right
+                                   hotswap-base-shape)]
+    (difference (union plate-half
+                       (->> plate-half
+                            (mirror [1 0 0])
+                            (mirror [0 1 0]))
+                       hotswap-holder))))
 
 ;;;;;;;;;;;;;;;;
 ;; SA Keycaps ;;
