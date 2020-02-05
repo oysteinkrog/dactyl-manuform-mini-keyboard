@@ -91,49 +91,26 @@
         side-nub (->> (binding [*fn* 30] (cylinder 1 2.75))
                       (rotate (/ π 2) [1 0 0])
                       (translate [(+ (/ keyswitch-width 2)) 0 1])
-                      (hull (->> (cube 1.5 2.75 plate-thickness)
+                      (hull (->> (cube 1.5 2.75 side-nub-thickness)
                                  (translate [(+ (/ 1.5 2) (/ keyswitch-width 2))
                                              0
-                                             (/ plate-thickness 2)]))))
-        plate-half (union top-wall
-                          left-wall
-                          (if create-side-nubs? (with-fn 100 side-nub) ()))
-        swap-holder (->> (cube (+ keyswitch-width 3) (/ (+ keyswitch-height 3) 2) 3)
-                         (translate [0 (/ (+ keyswitch-height 3) 4) -1.5]))
-        main-axis-hole (->> (cylinder (/ 4.0 2) 10)
-                            (with-fn 12))
-        plus-hole (->> (cylinder (/ 2.9 2) 10)
-                       (with-fn 8)
-                       (translate [-3.81 2.54 0]))
-        minus-hole (->> (cylinder (/ 2.9 2) 10)
-                        (with-fn 8)
-                        (translate [2.54 5.08 0]))
-        plus-hole-mirrored (->> (cylinder (/ 2.9 2) 10)
-                                (with-fn 8)
-                                (translate [3.81 2.54 0]))
-        minus-hole-mirrored (->> (cylinder (/ 2.9 2) 10)
-                                 (with-fn 8)
-                                 (translate [-2.54 5.08 0]))
-        friction-hole (->> (cylinder (/ 1.7 2) 10)
-                           (with-fn 8))
-        friction-hole-right (translate [5 0 0] friction-hole)
-        friction-hole-left (translate [-5 0 0] friction-hole)
-        hotswap-base-shape (->> (cube 19 6.2 3.5)
-                                (translate [0 4 -2.6]))
-        hotswap-holder (difference swap-holder
-                                   main-axis-hole
-                                   plus-hole
-                                   minus-hole
-                                   plus-hole-mirrored
-                                   minus-hole-mirrored
-                                   friction-hole-left
-                                   friction-hole-right
-                                   hotswap-base-shape)]
-    (difference (union plate-half
+                                             (/ side-nub-thickness 2)])))
+                      (translate [0 0 (- plate-thickness side-nub-thickness)]))
+        plate-half (union top-wall left-wall (if create-side-nubs? (with-fn 100 side-nub)))
+        top-nub (->> (cube 5 5 retention-tab-hole-thickness)
+                     (translate [(+ (/ keyswitch-width 2)) 0 (/ retention-tab-hole-thickness 2)]))
+        top-nub-pair (union top-nub
+                            (->> top-nub
+                                 (mirror [1 0 0])
+                                 (mirror [0 1 0])))]
+    (difference
+     (union plate-half
                        (->> plate-half
                             (mirror [1 0 0])
-                            (mirror [0 1 0]))
-                       hotswap-holder))))
+                 (mirror [0 1 0])))
+     (->>
+      top-nub-pair
+      (rotate (/ π 2) [0 0 1])))))
 
 ;;;;;;;;;;;;;;;;
 ;; SA Keycaps ;;
