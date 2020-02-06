@@ -70,9 +70,9 @@
 (def keyswitch-height 13.95) ;; Was 14.1, then 14.25
 (def keyswitch-width 13.95)
 
-(def sa-profile-key-height 12.7)
+(def sa-profile-key-height 7.39)
 
-(def plate-thickness 5)
+(def plate-thickness 3)
 (def side-nub-thickness 4)
 (def retention-tab-thickness 1.5)
 (def retention-tab-hole-thickness (- plate-thickness retention-tab-thickness))
@@ -252,7 +252,7 @@
 ;; Web Connectors ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(def web-thickness 3)
+(def web-thickness plate-thickness)
 (def post-size 0.1)
 (def web-post (->> (cube post-size post-size web-thickness)
                    (translate [0 0 (+ (/ web-thickness -2)
