@@ -70,7 +70,7 @@
 (def keyswitch-height 13.9) ;; Was 14.1, then 14.25, then 13.9 (for snug fit with with aliaz/outemy sky switches)
 (def keyswitch-width 13.9)
 
-(def sa-profile-key-height 12.7)
+(def sa-profile-key-height 7.39)
 
 (def plate-thickness 2)
 (def side-nub-thickness 4)
@@ -116,44 +116,54 @@
 ;; SA Keycaps ;;
 ;;;;;;;;;;;;;;;;
 
-(def sa-length 18.25)
-(def sa-double-length 37.5)
-(def sa-cap {1 (let [bl2 (/ 18.5 2)
-                     m (/ 17 2)
-                     key-cap (hull (->> (polygon [[bl2 bl2] [bl2 (- bl2)] [(- bl2) (- bl2)] [(- bl2) bl2]])
-                                        (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 0.05]))
-                                   (->> (polygon [[m m] [m (- m)] [(- m) (- m)] [(- m) m]])
-                                        (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 6]))
-                                   (->> (polygon [[6 6] [6 -6] [-6 -6] [-6 6]])
-                                        (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 12])))]
-                 (->> key-cap
-                      (translate [0 0 (+ 5 plate-thickness)])
-                      (color [220/255 163/255 163/255 1])))
-             2 (let [bl2 sa-length
-                     bw2 (/ 18.25 2)
-                     key-cap (hull (->> (polygon [[bw2 bl2] [bw2 (- bl2)] [(- bw2) (- bl2)] [(- bw2) bl2]])
-                                        (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 0.05]))
-                                   (->> (polygon [[6 16] [6 -16] [-6 -16] [-6 16]])
-                                        (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                        (translate [0 0 12])))]
-                 (->> key-cap
-                      (translate [0 0 (+ 5 plate-thickness)])
-                      (color [127/255 159/255 127/255 1])))
-             1.5 (let [bl2 (/ 18.25 2)
-                       bw2 (/ 27.94 2)
-                       key-cap (hull (->> (polygon [[bw2 bl2] [bw2 (- bl2)] [(- bw2) (- bl2)] [(- bw2) bl2]])
-                                          (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                          (translate [0 0 0.05]))
-                                     (->> (polygon [[11 6] [-11 6] [-11 -6] [11 -6]])
-                                          (extrude-linear {:height 0.1 :twist 0 :convexity 0})
-                                          (translate [0 0 12])))]
-                   (->> key-cap
-                        (translate [0 0 (+ 5 plate-thickness)])
-                        (color [240/255 223/255 175/255 1])))})
+(def sa-length 17.85)
+(def sa-width sa-length)
+(def sa-double-length 37.12)
+(def sa-cap
+  {1 (let [bl2 (/ sa-length 2)
+           key-cap (hull (->> (polygon [[bl2 bl2] [bl2 (- bl2)] [(- bl2) (- bl2)] [(- bl2) bl2]])
+                              (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                              (translate [0 0 0.05]))
+                         (->> (polygon [[6 6] [6 -6] [-6 -6] [-6 6]])
+                              (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                              (translate [0 0 sa-profile-key-height])))]
+       (->> key-cap
+            (translate [0 0 (+ 5 plate-thickness)])
+            (color [220/255 163/255 163/255 1])))
+   1.25 (let [bl2 (/ 17.5 2)
+             bw2 (/ 27.5 2)
+             key-cap (hull (->> (polygon [[bw2 bl2] [bw2 (- bl2)] [(- bw2) (- bl2)] [(- bw2) bl2]])
+                                (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                                (translate [0 0 0.05]))
+                           (->> (polygon [[11 6] [-11 6] [-11 -6] [11 -6]])
+                                (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                                (translate [0 0 sa-profile-key-height])))]
+         (->> key-cap
+              (translate [0 0 (+ 5 plate-thickness)])
+              (color [240/255 223/255 175/255 1])))
+   1.5 (let [bl2 (/ sa-length 2)
+             bw2 (/ 28 2)
+             key-cap (hull (->> (polygon [[bw2 bl2] [bw2 (- bl2)] [(- bw2) (- bl2)] [(- bw2) bl2]])
+                                (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                                (translate [0 0 0.05]))
+                           (->> (polygon [[11 6] [-11 6] [-11 -6] [11 -6]])
+                                (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                                (translate [0 0 sa-profile-key-height])))]
+         (->> key-cap
+              (translate [0 0 (+ 5 plate-thickness)])
+              (color [240/255 223/255 175/255 1])))
+   2 (let [bl2 sa-double-length
+           bw2 (/ sa-width 2)
+           key-cap (hull (->> (polygon [[bw2 bl2] [bw2 (- bl2)] [(- bw2) (- bl2)] [(- bw2) bl2]])
+                              (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                              (translate [0 0 0.05]))
+                         (->> (polygon [[6 16] [6 -16] [-6 -16] [-6 16]])
+                              (extrude-linear {:height 0.1 :twist 0 :convexity 0})
+                              (translate [0 0 sa-profile-key-height])))]
+       (->> key-cap
+            (translate [0 0 (+ 5 plate-thickness)])
+            (color [127/255 159/255 127/255 1])))
+   })
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; Placement Functions ;;
