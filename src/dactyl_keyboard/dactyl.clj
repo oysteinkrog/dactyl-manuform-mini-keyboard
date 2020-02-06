@@ -353,12 +353,23 @@
 
 (defn thumb-1x-layout [shape]
   (union
-   (thumb-tl-place shape)
-   (thumb-bl-place shape)))
+    ;(thumb-bl-place shape)
+    )
+  )
+
+(defn thumb-125x-layout [shape]
+  (union
+    (thumb-tl-place shape)
+    (thumb-bl-place shape)
+    (thumb-tr-place shape)
+    )
+  )
 
 (defn thumb-15x-layout [shape]
   (union
-   (thumb-tr-place shape)))
+   ;(thumb-tr-place shape)l
+)
+)
 
 (def larger-plate
   (let [plate-height (- (/ (- sa-double-length mount-height) 3) 0.5)
@@ -370,11 +381,15 @@
 (def thumbcaps
   (union
    (thumb-1x-layout (sa-cap 1))
-   (thumb-15x-layout (rotate (/ π 2) [0 0 1] (sa-cap 1)))))
+   (thumb-125x-layout (rotate (/ π 2) [0 0 1] (sa-cap 1.25)))
+   (thumb-15x-layout (rotate (/ π 2) [0 0 1] (sa-cap 1.5)))
+   )
+  )
 
 (def thumb
   (union
    (thumb-1x-layout single-plate)
+   (thumb-125x-layout single-plate)
    (thumb-15x-layout single-plate)
    #_(thumb-15x-layout larger-plate)))
 
