@@ -329,6 +329,7 @@
   (map + (key-position 1 cornerrow [(/ mount-width 2) (- (/ mount-height 2)) 0])
        thumb-offsets))
 
+;top right
 (defn thumb-tr-place [shape]
   (->> shape
        (rotate (deg2rad  14) [1 0 0])
@@ -380,7 +381,7 @@
    (thumb-tr-place shape)))
 
 (def larger-plate
-  (let [plate-height (- (/ (- sa-double-length mount-height) 3) 0.5)
+  (let [plate-height (- (/ (- cap-2u mount-height) 3) 0.5)
         top-plate (->> (cube mount-width plate-height web-thickness)
                        (translate [0 (/ (+ plate-height mount-height) 2)
                                    (- plate-thickness (/ web-thickness 2))]))]
