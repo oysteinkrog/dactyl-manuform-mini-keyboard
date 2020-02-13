@@ -738,19 +738,14 @@
 
 (spit "things/right-test.scad"
       (write-scad
-       (difference
         (union
-         key-holes
-         pinky-connectors
-         pinky-walls
-         connectors
-         thumb
-         thumb-connectors
-         case-walls
-         thumbcaps
-         caps)
+          model-right
+          caps
+          thumbcaps
+          )
+        )
+      )
 
-        (translate [0 0 -20] (cube 350 350 40)))))
 
 (spit "things/right-plate.scad"
       (write-scad
