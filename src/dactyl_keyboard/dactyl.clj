@@ -12,7 +12,7 @@
 ;; Shape parameters ;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
-(def nrows 5)
+(def nrows 4)
 (def ncols 6)
 
 (def α (/ π 12))                        ; curvature of the columns
@@ -23,7 +23,7 @@
 (def column-style
   (if (> nrows 5) :orthographic :standard))  ; options include :standard, :orthographic, and :fixed
 ; (def column-style :fixed)
-(def pinky-15u true)
+(def pinky-15u false)
 
 (defn column-offset [column] (cond
                                (= column 2) [0 2.82 -4.5]
@@ -53,7 +53,7 @@
 
 ; If you use Cherry MX or Gateron switches, this can be turned on.
 ; If you use other switches such as Kailh, you should set this as false
-(def create-side-nubs? true)
+(def create-side-nubs? false)
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; General variables ;;
@@ -67,8 +67,8 @@
 ;; Switch Hole ;;
 ;;;;;;;;;;;;;;;;;
 
-(def keyswitch-height 14.2) ;; Was 14.1, then 14.25
-(def keyswitch-width 14.2)
+(def keyswitch-height 13.9) ;; Was 14.1, then 14.25, then 13.9 (for snug fit with with aliaz/outemy sky switches)
+(def keyswitch-width 13.9)
 
 (def sa-profile-key-height 12.7)
 
