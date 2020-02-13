@@ -15,11 +15,11 @@
 (def nrows 4)
 (def ncols 6)
 
-(def α (/ π 10))                        ; curvature of the columns
+(def α (/ π 11))                        ; curvature of the columns
 (def β (/ π 36))                        ; curvature of the rows
-(def centerrow (- nrows 2.5))             ; controls front-back tilt
+(def centerrow (- nrows 2.8))             ; controls front-back tilt
 (def centercol 2)                       ; controls left-right tilt / tenting (higher number is more tenting)
-(def tenting-angle (/ π 12))            ; or, change this for more precise tenting control
+(def tenting-angle (/ π 14))            ; or, change this for more precise tenting control
 (def column-style
   (if (> nrows 5) :orthographic :standard))  ; options include :standard, :orthographic, and :fixed
 ; (def column-style :fixed)
@@ -27,10 +27,10 @@
 
 (defn column-offset [column] (cond
                                (= column 2) [0 2.82 -4.5]
-                               (>= column 4) [0 -12 5.64]            ; original [0 -5.8 5.64]
+                               (>= column 4) [0 -16 5.64]            ; original [0 -5.8 5.64]
                                :else [0 0 0]))
 
-(def thumb-offsets [6 -3 7])
+(def thumb-offsets [12 -3 7])
 
 (def keyboard-z-offset 8)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
@@ -334,21 +334,21 @@
        (rotate (deg2rad -15) [0 1 0])
        (rotate (deg2rad  25) [0 0 1]) ; original 10
        (translate thumborigin)
-       (translate [-23 -8 5]))) ; original 1.5u  (translate [-12 -16 3])
+       (translate [-23 -8 2]))) ; original 1.5u  (translate [-12 -16 3])
 (defn thumb-tl-place [shape]
   (->> shape
        (rotate (deg2rad  10) [1 0 0])
        (rotate (deg2rad -23) [0 1 0])
        (rotate (deg2rad  26) [0 0 1]) ; original 10
        (translate thumborigin)
-       (translate [-37 -15.5 -2]))) ; original 1.5u (translate [-32 -15 -2])))
+       (translate [-37 -15.5 -4]))) ; original 1.5u (translate [-32 -15 -2])))
 (defn thumb-bl-place [shape]
   (->> shape
        (rotate (deg2rad   6) [1 0 0])
        (rotate (deg2rad -32) [0 1 0])
        (rotate (deg2rad  27) [0 0 1])
        (translate thumborigin)
-       (translate [-49 -24 -11.5]))) ;        (translate [-51 -25 -12])))
+       (translate [-49 -24 -10]))) ;        (translate [-51 -25 -12])))
 
 
 (defn thumb-1x-layout [shape]
