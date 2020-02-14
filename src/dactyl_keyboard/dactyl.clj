@@ -72,7 +72,7 @@
 
 (def sa-profile-key-height 7.39)
 
-(def plate-thickness 2)
+(def plate-thickness 3)
 (def side-nub-thickness 4)
 (def retention-tab-thickness 1.5)
 (def retention-tab-hole-thickness (- plate-thickness retention-tab-thickness))
@@ -262,7 +262,7 @@
 ;; Web Connectors ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(def web-thickness 2)
+(def web-thickness 3)
 (def post-size 0.1)
 (def web-post (->> (cube post-size post-size web-thickness)
                    (translate [0 0 (+ (/ web-thickness -2)
