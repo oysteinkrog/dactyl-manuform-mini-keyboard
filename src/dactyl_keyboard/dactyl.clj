@@ -15,9 +15,9 @@
 (def nrows 4)
 (def ncols 6)
 
-(def α (/ π 12))                        ; curvature of the columns
+(def α (/ π 10))                        ; curvature of the columns
 (def β (/ π 36))                        ; curvature of the rows
-(def centerrow (- nrows 3))             ; controls front-back tilt
+(def centerrow (- nrows 2.8))             ; controls front-back tilt
 (def centercol 2)                       ; controls left-right tilt / tenting (higher number is more tenting)
 (def tenting-angle (/ π 16))            ; or, change this for more precise tenting control
 (def column-style
