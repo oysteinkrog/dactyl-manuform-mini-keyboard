@@ -346,11 +346,11 @@
        (rotate (deg2rad -23) [0 1 0])
        (rotate (deg2rad  17) [0 0 1]) ; original 10
        (translate thumborigin)
-       (translate [-32.5 -15 -1]))) ; original 1.5u (translate [-32 -15 -2])))
+       (translate [-32.5 -15 -0.5]))) ; original 1.5u (translate [-32 -15 -2])))
 ; top left
 (defn thumb-bl-place [shape]
   (->> shape
-       (rotate (deg2rad   6) [1 0 0])
+       (rotate (deg2rad   8) [1 0 0])
        (rotate (deg2rad -32) [0 1 0])
        (rotate (deg2rad  23) [0 0 1])
        (translate thumborigin)
