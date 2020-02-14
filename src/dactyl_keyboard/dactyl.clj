@@ -97,20 +97,22 @@
                                              (/ side-nub-thickness 2)])))
                       (translate [0 0 (- plate-thickness side-nub-thickness)]))
         plate-half (union top-wall left-wall (if create-side-nubs? (with-fn 100 side-nub)))
-        top-nub (->> (cube 5 5 retention-tab-hole-thickness)
-                     (translate [(+ (/ keyswitch-width 2)) 0 (/ retention-tab-hole-thickness 2)]))
-        top-nub-pair (union top-nub
-                            (->> top-nub
-                                 (mirror [1 0 0])
-                                 (mirror [0 1 0])))]
+        ;top-nub (->> (cube 5 5 retention-tab-hole-thickness)
+                     ;(translate [(+ (/ keyswitch-width 2)) 0 (/ retention-tab-hole-thickness 2)]))
+        ;top-nub-pair (union top-nub
+                            ;(->> top-nub
+                                 ;(mirror [1 0 0])
+                                 ;(mirror [0 1 0])))
+        ]
     (difference
      (union plate-half
             (->> plate-half
                  (mirror [1 0 0])
                  (mirror [0 1 0])))
-     (->>
-      top-nub-pair
-      (rotate (/ π 2) [0 0 1])))))
+     ;(->>
+      ;top-nub-pair
+      ;(rotate (/ π 2) [0 0 1]))
+     )))
 
 ;;;;;;;;;;;;;;;;
 ;; SA Keycaps ;;
