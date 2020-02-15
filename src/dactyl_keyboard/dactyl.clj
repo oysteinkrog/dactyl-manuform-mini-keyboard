@@ -35,7 +35,7 @@
 (def keyboard-z-offset 9)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
 (def extra-width 2.5)                   ; extra space between the base of keys; original= 2
-(def extra-height 1.0)                  ; original= 0.5
+(def extra-height 1.5)                  ; original= 0.5
 
 (def wall-z-offset -5)                 ; original=-15 length of the first downward-sloping part of the wall (negative)
 (def wall-xy-offset 5)                  ; offset in the x and/or y direction for the first downward-sloping part of the wall (negative)
@@ -344,9 +344,9 @@
   (->> shape
        (rotate (deg2rad  7) [1 0 0])
        (rotate (deg2rad -23) [0 1 0])
-       (rotate (deg2rad  17) [0 0 1]) ; original 10
+       (rotate (deg2rad  18) [0 0 1]) ; original 10
        (translate thumborigin)
-       (translate [-32.5 -15 -0.5]))) ; original 1.5u (translate [-32 -15 -2])))
+       (translate [-33.5 -13 -0.5]))) ; original 1.5u (translate [-32 -15 -2])))
 ; top left
 (defn thumb-bl-place [shape]
   (->> shape
@@ -360,9 +360,9 @@
   (->> shape
        (rotate (deg2rad  10) [1 0 0])
        (rotate (deg2rad -25) [0 1 0])
-       (rotate (deg2rad  18) [0 0 1])
+       (rotate (deg2rad  22) [0 0 1])
        (translate thumborigin)
-       (translate [-23 -34 -4])))
+       (translate [-24 -32 -4])))
 ; bottom left
 (defn thumb-br-place [shape]
   (->> shape
@@ -614,8 +614,8 @@
 
 (def usb-jack (translate (map + usb-holder-position [0 10 3]) (cube 8.1 20 3.1)))
 
-(def pro-micro-position (map + (key-position 0 1 (wall-locate3 -1 0)) [-6 2 -15]))
-(def pro-micro-space-size [4 10 12]) ; z has no wall;
+(def pro-micro-position (map + (key-position 0 1 (wall-locate3 -1 0)) [-6 10 -10]))
+(def pro-micro-space-size [4 10 10]) ; z has no wall;
 (def pro-micro-wall-thickness 2)
 (def pro-micro-holder-size [(+ pro-micro-wall-thickness (first pro-micro-space-size)) (+ pro-micro-wall-thickness (second pro-micro-space-size)) (last pro-micro-space-size)])
 (def pro-micro-space
@@ -667,13 +667,18 @@
          (translate (map + offset [(first position) (second position) (/ height 2)])))))
 
 (defn screw-insert-all-shapes [bottom-radius top-radius height]
-  (union (screw-insert 0 0         bottom-radius top-radius height [8 10 0])
-         (screw-insert 0 lastrow   bottom-radius top-radius height [3 0 0])
+  (union 
+         ; near usb/trss holes
+         (screw-insert 0 0         bottom-radius top-radius height [8 9 0])
         ;  (screw-insert lastcol lastrow  bottom-radius top-radius height [-5 13 0])
         ;  (screw-insert lastcol 0         bottom-radius top-radius height [-3 6 0])
+         ; thum cluster left
+         (screw-insert 0 lastrow   bottom-radius top-radius height [3 6 0])
+         ; thumb cluster, closest to user
+         (screw-insert 1 lastrow         bottom-radius top-radius height [-3 -14 0])
          (screw-insert lastcol lastrow  bottom-radius top-radius height [-4 12 0])
          (screw-insert lastcol 0         bottom-radius top-radius height [-3 7 0])
-         (screw-insert 1 lastrow         bottom-radius top-radius height [2 -17 0])))
+))
 
 ; Hole Depth Y: 4.4
 (def screw-insert-height 4)
