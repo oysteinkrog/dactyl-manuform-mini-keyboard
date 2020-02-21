@@ -705,7 +705,7 @@
 
 ; Wall Thickness W:\t1.65
 (def screw-insert-outers (screw-insert-all-shapes (+ screw-insert-bottom-radius 1.65) (+ screw-insert-top-radius 1.65) (+ screw-insert-height 1.5)))
-(def screw-insert-screw-holes  (screw-insert-all-shapes 1.5 1.5 350))
+(def screw-insert-screw-holes  (screw-insert-all-shapes 1.25 1.25 350))
 
 (def pinky-connectors
   (apply union
