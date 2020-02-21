@@ -338,9 +338,9 @@
   (->> shape
        (rotate (deg2rad  5) [1 0 0])
        (rotate (deg2rad -15) [0 1 0])
-       (rotate (deg2rad  10) [0 0 1]) ; original 10
+       (rotate (deg2rad  16) [0 0 1]) ; original 10
        (translate thumborigin)
-       (translate [-15 -10 5]))) ; original 1.5u  (translate [-12 -16 3])
+       (translate [-16 -10 5]))) ; original 1.5u  (translate [-12 -16 3])
 ;top middle
 (defn thumb-tl-place [shape]
   (->> shape
