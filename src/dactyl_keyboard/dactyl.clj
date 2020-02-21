@@ -30,7 +30,7 @@
                                (>= column 4) [0 -16 4.64]            ; original [0 -5.8 5.64]
                                :else [0 0 0]))
 
-(def thumb-offsets [4 -1 7])
+(def thumb-offsets [4 -3 7])
 
 (def keyboard-z-offset 9)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
