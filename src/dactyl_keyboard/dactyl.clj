@@ -122,6 +122,8 @@
 (def cap-1u-top 12)
 (def cap-2u (* cap-1u 2))
 (def bl2 (/ cap-1u 2))
+(def cap-travel 4)
+(def cap-pos (+ 1 cap-travel))
 (def sa-cap
   {1 (let [key-cap (hull (->> (polygon [[bl2 bl2] [bl2 (- bl2)] [(- bl2) (- bl2)] [(- bl2) bl2]])
                               (extrude-linear {:height 0.1 :twist 0 :convexity 0})
@@ -130,7 +132,7 @@
                               (extrude-linear {:height 0.1 :twist 0 :convexity 0})
                               (translate [0 0 sa-profile-key-height])))]
        (->> key-cap
-            (translate [0 0 (+ 5 plate-thickness)])
+            (translate [0 0 (+ cap-pos plate-thickness)])
             (color [220/255 163/255 163/255 1])))
    1.25 (let [
              bw2 (/ (* cap-1u 1.25) 2)
@@ -142,7 +144,7 @@
                                 (extrude-linear {:height 0.1 :twist 0 :convexity 0})
                                 (translate [0 0 sa-profile-key-height])))]
          (->> key-cap
-              (translate [0 0 (+ 5 plate-thickness)])
+              (translate [0 0 (+ cap-pos plate-thickness)])
               (color [240/255 223/255 175/255 1])))
    1.5 (let [bw2 (/ (* cap-1u 1.5) 2)
              tw2 (- bw2 6)
@@ -153,7 +155,7 @@
                                 (extrude-linear {:height 0.1 :twist 0 :convexity 0})
                                 (translate [0 0 sa-profile-key-height])))]
          (->> key-cap
-              (translate [0 0 (+ 5 plate-thickness)])
+              (translate [0 0 (+ cap-pos plate-thickness)])
               (color [240/255 223/255 175/255 1])))
    2 (let [bw2 (/ (* cap-1u 2) 2)
            tw2 (- bw2 6)
@@ -164,7 +166,7 @@
                               (extrude-linear {:height 0.1 :twist 0 :convexity 0})
                               (translate [0 0 sa-profile-key-height])))]
        (->> key-cap
-            (translate [0 0 (+ 5 plate-thickness)])
+            (translate [0 0 (+ cap-pos plate-thickness)])
             (color [127/255 159/255 127/255 1])))
    })
 
