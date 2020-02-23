@@ -709,7 +709,7 @@
          (screw-insert 0 lastrow   bottom-radius top-radius height [3 6 0])
          ; thumb cluster, closest to user
          (screw-insert 1 lastrow         bottom-radius top-radius height [-3 -14 0])
-         (screw-insert lastcol lastrow  bottom-radius top-radius height [-4 12 0])
+         (screw-insert lastcol lastrow  bottom-radius top-radius height [-4 14 0])
          (screw-insert lastcol 0         bottom-radius top-radius height [-3 7 0])
 ))
 
