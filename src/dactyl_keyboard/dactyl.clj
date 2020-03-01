@@ -27,7 +27,7 @@
 
 (defn column-offset [column] (cond
                                (= column 2) [0 2.82 -4.0]
-                               (>= column 4) [0 -16 4.64]            ; original [0 -5.8 5.64]
+                               (>= column 4) [0 -14 4.64]            ; original [0 -5.8 5.64]
                                :else [0 0 0]))
 
 (def thumb-offsets [4 -3 7])
