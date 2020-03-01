@@ -803,34 +803,35 @@
   )
 
 (def scale-amount
-  (/ (* 83.7 scale-cos) 18.33)
+  (/ (* 83.7 scale-cos) 19.33)
   )
 
 (def wrist-rest
   (difference
-    (scale [4.45  scale-amount  1] (difference (union
+    (scale [4.25  scale-amount  1] (difference (union
                                                  (difference
                                                    ;the main back circle
                                                    (scale[1.3, 1, 1](->> (cylinder 10 150)(with-fn 200)
                                                                          (translate [0 0 0])))
                                                    ;front cut cube and circle
                                                    (scale[1.1, 1, 1](->> (cylinder 7 201)(with-fn 200)
-                                                                         (translate [0 -13.6 0]))
-                                                               (->> (cube 18 10 201)(translate [0 -12.6 0]))
-                                                               )
-                                                   )
+                                                                         (translate [0 -13.4 0]))
+                                                               (->> (cube 18 10 201)(translate [0 -12.4 0]))
+
+                                                               ))
                                                  ;;side fillers
                                                  (->> (cylinder 6.8 200)(with-fn 200)
                                                       (translate [-6.15 -0.98 0]))
 
                                                  (->> (cylinder 6.8 200)(with-fn 200)
                                                       (translate [6.15 -0.98 0]))
-                                                 ;heart shapes at bottom
+                                                 ;;heart shapes at bottom
                                                  (->> (cylinder 5.9 200)(with-fn 200)
-                                                      (translate [-6.15 0 0]))
+                                                      (translate [-6.35 -2 0]))
+
 
                                                  (scale[1.01, 1, 1](->> (cylinder 5.9 200)(with-fn 200)
-                                                                        (translate [6.15 0. 0])))
+                                                                        (translate [6.35 -2. 0])))
                                                  )
 
                                                )
