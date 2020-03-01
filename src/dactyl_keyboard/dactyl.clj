@@ -703,27 +703,31 @@
   (union 
          ; near usb/trss holes
          (screw-insert 0 0         bottom-radius top-radius height [8 9 0])
-        ;  (screw-insert lastcol lastrow  bottom-radius top-radius height [-5 13 0])
-        ;  (screw-insert lastcol 0         bottom-radius top-radius height [-3 6 0])
-         ; thum cluster left
+         ; thumb cluster left
          (screw-insert 0 lastrow   bottom-radius top-radius height [3 6 0])
+         ; middle top
+         (screw-insert 3 lastrow         bottom-radius top-radius height [-7 1 0])
          ; thumb cluster, closest to user
          (screw-insert 1 lastrow         bottom-radius top-radius height [-3 -14 0])
+         ; lower right
          (screw-insert lastcol lastrow  bottom-radius top-radius height [-4 14 0])
-         (screw-insert lastcol 0         bottom-radius top-radius height [-3 7 0])
+         ; middle bottom
+         (screw-insert 3 0         bottom-radius top-radius height [-9 -3 0])
+         ; top right
+         (screw-insert lastcol 0         bottom-radius top-radius height [-4 7 0])
 ))
 
 ; Hole Depth Y: 4.4
 (def screw-insert-height 4)
 
 ; Hole Diameter C: 4.1-4.4
-(def screw-insert-bottom-radius (/ 4.4 2))
-(def screw-insert-top-radius (/ 4.4 2))
+(def screw-insert-bottom-radius (/ 4.0 2))
+(def screw-insert-top-radius (/ 4.0 2))
 (def screw-insert-holes  (screw-insert-all-shapes screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
 
 ; Wall Thickness W:\t1.65
 (def screw-insert-outers (screw-insert-all-shapes (+ screw-insert-bottom-radius 1.65) (+ screw-insert-top-radius 1.65) (+ screw-insert-height 1.5)))
-(def screw-insert-screw-holes  (screw-insert-all-shapes 1.25 1.25 350))
+(def screw-insert-screw-holes  (screw-insert-all-shapes 1.5 1.5 350))
 
 (def pinky-connectors
   (apply union
