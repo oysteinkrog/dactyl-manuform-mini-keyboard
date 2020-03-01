@@ -206,9 +206,33 @@
 
 (defn offset-for-column [col]
   (if (and (true? pinky-15u) (= col lastcol)) 5.5 0))
+
+(defn extra-rot-x-for-key [row col]
+  (cond
+    (and (= row 3) (= col 2)) (/ π 6)
+    (and (= row 3) (= col 3)) (/ π 10)
+    :else 0
+    ))
+
+(defn extra-rot-y-for-key [row col]
+  (cond
+    (and (= row 3) (= col 2)) (/ π -10)
+    :else 0
+    ))
+
+(defn extra-translate-for-key [row col]
+  (cond
+    (and (= row 3) (= col 2)) [-5 -5 15]
+    (and (= row 3) (= col 3)) [0 0 -3]
+    :else [0 0 0]
+    ))
+
 (defn apply-key-geometry [translate-fn rotate-x-fn rotate-y-fn column row shape]
   (let [column-angle (* β (- centercol column))
         placed-shape (->> shape
+                          (rotate-x-fn  (extra-rot-x-for-key row column))
+                          (rotate-y-fn  (extra-rot-y-for-key row column))
+                          (translate-fn (extra-translate-for-key row column))
                           (translate-fn [(offset-for-column column) 0 (- row-radius)])
                           (rotate-x-fn  (* α (- centerrow row)))
                           (translate-fn [0 0 row-radius])
