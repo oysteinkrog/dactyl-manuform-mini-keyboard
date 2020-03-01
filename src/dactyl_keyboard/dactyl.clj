@@ -59,11 +59,11 @@
 ;;;;;;;;;Wrist rest;;;;;;;;;;
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@
 (def wrist-rest-on 1) 						;;0 for no rest 1 for a rest connection cut out in bottom case
-(def wrist-rest-back-height 25)				;;height of the back of the wrist rest--Default 34
-(def wrist-rest-angle 5) 			        ;;angle of the wrist rest--Default 20
+(def wrist-rest-back-height 20)				;;height of the back of the wrist rest--Default 34
+(def wrist-rest-angle -1) 			        ;;angle of the wrist rest--Default 20
 (def wrist-rest-rotation-angle 10)			;;0 default The angle in counter clockwise the wrist rest is at
 (def wrist-rest-ledge 3.5)					;;The height of ledge the silicone wrist rest fits inside
-(def wrist-rest-y-angle -10)					;;0 Default.  Controls the wrist rest y axis tilt (left to right)
+(def wrist-rest-y-angle -3)					;;0 Default.  Controls the wrist rest y axis tilt (left to right)
 
 
 ;;Wrist rest to case connections
@@ -71,7 +71,7 @@
 (def middle_wrist_connecter_x   (if (== ncols 5) -5 0))
 (def left_wrist_connecter_x   (if (== ncols 5) -25 -25))
 (def wrist_right_nut_y (if (== ncols 5) 10 16))
-(def wrist_brse_position_x -1)
+(def wrist_brse_position_x 10)
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; General variables ;;
