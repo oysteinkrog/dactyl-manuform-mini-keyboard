@@ -833,8 +833,15 @@
                     ;(->> (cube 200 200 200)(translate [0 0 (- (+ (/ (* 17.7 (Math/tan(/ (* π wrist-rest-angle) 180))) 4) wrist-rest-back-height)(+ 100  wrist-rest-ledge))])(rotate  (/ (* π wrist-rest-angle) 180)  [1 0 0])))
                     )
                   )
+             (translate [40 -28 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+             (translate [-40 -28 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+             (translate [50 10 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+             (translate [-50 10 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+             (translate [-50 10 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+             (translate [0 40 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
              );(rotate  (/ (* π wrist-rest-rotation-angle) 180)  [0 0 1])
-           ))
+           )
+    )
   )
 
 
