@@ -209,21 +209,22 @@
 
 (defn extra-rot-x-for-key [row col]
   (cond
-    (and (= row 3) (= col 2)) (/ π 6)
-    (and (= row 3) (= col 3)) (/ π 10)
+    (and (= row 3) (= col 2)) (/ π 8)
+    (and (= row 3) (= col 3)) (/ π 8)
     :else 0
     ))
 
 (defn extra-rot-y-for-key [row col]
   (cond
-    (and (= row 3) (= col 2)) (/ π -10)
+    (and (= row 3) (= col 2)) (/ π -12)
+    (and (= row 3) (= col 3)) (/ π -36)
     :else 0
     ))
 
 (defn extra-translate-for-key [row col]
   (cond
-    (and (= row 3) (= col 2)) [-5 -5 15]
-    (and (= row 3) (= col 3)) [0 0 -3]
+    (and (= row 3) (= col 2)) [-8 -7 13]
+    (and (= row 3) (= col 3)) [-2 0 5]
     :else [0 0 0]
     ))
 
