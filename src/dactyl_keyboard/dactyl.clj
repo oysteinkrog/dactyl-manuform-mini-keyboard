@@ -999,6 +999,10 @@
 (spit "things/wrist-rest.scad"
       (write-scad wrist-rest-build))
 
+(spit "things/caps-crash-test.scad"
+      (write-scad
+       (intersection model-right caps)))
+
 (spit "things/test.scad"
       (write-scad
        (difference trrs-holder trrs-holder-hole)))
