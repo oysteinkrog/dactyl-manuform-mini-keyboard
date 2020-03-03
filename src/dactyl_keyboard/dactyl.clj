@@ -140,8 +140,9 @@
 (def cap-1u-top 12)
 (def cap-2u (* cap-1u 2))
 (def bl2 (/ cap-1u 2))
-(def cap-travel 4)
-(def cap-pos (+ 1 cap-travel))
+(def cap-pressed 0) ; percentage, 1 is fully pressed
+(def cap-travel 3) ; how much the key switches depress
+(def cap-pos (+ 2 (* (- 1 cap-pressed) cap-travel)))
 (def sa-cap
   {1 (let [key-cap (hull (->> (polygon [[bl2 bl2] [bl2 (- bl2)] [(- bl2) (- bl2)] [(- bl2) bl2]])
                               (extrude-linear {:height 0.1 :twist 0 :convexity 0})
