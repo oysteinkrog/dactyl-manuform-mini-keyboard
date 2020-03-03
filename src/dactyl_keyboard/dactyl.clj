@@ -223,7 +223,7 @@
 
 (defn extra-translate-for-key [row col]
   (cond
-    (and (= row 3) (= col 2)) [-8 -7 13]
+    (and (= row 3) (= col 2)) [-9 -7 13]
     (and (= row 3) (= col 3)) [-2 0 5]
     :else [0 0 0]
     ))
