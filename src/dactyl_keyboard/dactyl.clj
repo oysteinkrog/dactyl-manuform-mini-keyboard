@@ -59,19 +59,18 @@
 ;;;;;;;;;Wrist rest;;;;;;;;;;
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@
 (def wrist-rest-on 1) 						;;0 for no rest 1 for a rest connection cut out in bottom case
-(def wrist-rest-back-height 20)				;;height of the back of the wrist rest--Default 34
+(def wrist-rest-back-height 18)				;;height of the back of the wrist rest--Default 34
 (def wrist-rest-angle -1) 			        ;;angle of the wrist rest--Default 20
-(def wrist-rest-rotation-angle 10)			;;0 default The angle in counter clockwise the wrist rest is at
+(def wrist-rest-rotation-angle 140)			;;0 default The angle in counter clockwise the wrist rest is at
 (def wrist-rest-ledge 3.5)					;;The height of ledge the silicone wrist rest fits inside
-(def wrist-rest-y-angle -3)					;;0 Default.  Controls the wrist rest y axis tilt (left to right)
+(def wrist-rest-y-angle 0)					;;0 Default.  Controls the wrist rest y axis tilt (left to right)
 
 
 ;;Wrist rest to case connections
 (def right_wrist_connecter_x   (if (== ncols 5) 13 25))
 (def middle_wrist_connecter_x   (if (== ncols 5) -5 0))
 (def left_wrist_connecter_x   (if (== ncols 5) -25 -25))
-(def wrist_right_nut_y (if (== ncols 5) 10 16))
-(def wrist_brse_position_x 10)
+(def wrist_brse_position [20 -30 0])
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; General variables ;;
@@ -878,29 +877,30 @@
 	;;right cut
 			(->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x 24 4.5]))
 			(->> (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x (+ 33.8 nrows) 4.5]))
-			(->> (cube 6 3 12.2)(translate [right_wrist_connecter_x (+ wrist_right_nut_y nrows) 1.5]));;39
+			(->> (cube 6 3 12.2)(translate [right_wrist_connecter_x (+ 21 nrows) 1.5]));;39
 	;;middle cut
 			(->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x 14 4.5]))
 			(->> (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x 20 4.5]))
-			(->> (cube 6 3 12.2)(translate [middle_wrist_connecter_x (+ 15 nrows) 1.5]))
+			(->> (cube 6 3 12.2)(translate [middle_wrist_connecter_x (+ 17 nrows) 1.5]))
 
 	;;left
 			(->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x 11 4.5]))
 			(->>   (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x (+ 17.25 nrows) 4.5]))
-			(->> (cube 6 3 12.2)(translate [left_wrist_connecter_x (+ 16.0 nrows) 1.5]))
+			(->> (cube 6 3 12.2)(translate [left_wrist_connecter_x (+ 17.0 nrows) 1.5]))
 	)
 )
 
 (def rest-case-connectors
+  (translate [0 10 0]
 	(difference
 		(union
 
-			(scale [1 1 1.6] (->> (cylinder 6 60)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x 4 0])));;right
-			(scale [1 1 1.6] (->> (cylinder 6 60)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x -5 0])))
-			(scale [1 1 1.6] (->> (cylinder 6 80)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x -9 0])))
+			(scale [1 1 1.6] (->> (cylinder 6 50)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x 5 0])));;right
+			(scale [1 1 1.6] (->> (cylinder 6 50)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x -2 0])))
+			(scale [1 1 1.6] (->> (cylinder 6 50)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x -6 0])))
 	;rest-case-cuts
 		)
-	)
+	))
 )
 
 (def wrist-rest-locate
@@ -922,8 +922,8 @@
 (def wrist-rest-build
 	(difference
 		(->> (union
-
-			(->> wrist-rest-base (translate [wrist_brse_position_x -32 0])(rotate  (/ (* π wrist-rest-rotation-angle) 180)  [0 0 1]))
+          
+			(->> (translate wrist_brse_position (rotate  (/ (* π wrist-rest-rotation-angle) 180) [0 0 1] wrist-rest-base) ))
 					(->> (difference
 				;wrist-rest-sides
 
