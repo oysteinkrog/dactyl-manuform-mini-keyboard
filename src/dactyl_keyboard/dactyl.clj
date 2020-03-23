@@ -83,11 +83,11 @@
 ; If you use Cherry MX or Gateron switches, this can be turned on.
 ; If you use other switches such as Kailh, you should set this as false
 
-; kailh: no nubs, 13.9
+; kailh/aliaz: no nubs, 13.9
 ; outemu: nubs, 14.05
-(def create-side-nubs? false)
-(def keyswitch-height 13.9) ;; Was 14.1, then 14.25, then 13.9 (for snug fit with with aliaz/outemy sky switches)
-(def keyswitch-width 13.9)
+(def create-side-nubs? true)
+(def keyswitch-height 14.05) ;; Was 14.1, then 14.25, then 13.9 (for snug fit with with aliaz/outemy sky switches)
+(def keyswitch-width 14.05)
 
 (def sa-profile-key-height 7.39)
 
