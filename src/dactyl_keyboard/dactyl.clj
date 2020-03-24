@@ -84,10 +84,10 @@
 ; If you use other switches such as Kailh, you should set this as false
 
 ; kailh/aliaz: no nubs, 13.9
-; outemu: nubs, 14.05
+; outemu: nubs, 14.05x14.1
 (def create-side-nubs? true)
-(def keyswitch-height 14.05) ;; Was 14.1, then 14.25, then 13.9 (for snug fit with with aliaz/outemy sky switches)
-(def keyswitch-width 14.05)
+(def keyswitch-height 14.2) ;; Was 14.1, then 14.25, then 13.9 (for snug fit with with aliaz/outemy sky switches)
+(def keyswitch-width 14.15)
 
 (def sa-profile-key-height 7.39)
 
