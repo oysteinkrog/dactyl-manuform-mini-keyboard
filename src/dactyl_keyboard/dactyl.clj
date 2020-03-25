@@ -382,7 +382,7 @@
 (defn thumb-ttr-place [shape]
   (->> shape
        (rotate (deg2rad  7) [1 0 0])
-       (rotate (deg2rad -7) [0 1 0])
+       (rotate (deg2rad -3) [0 1 0])
        (rotate (deg2rad 7) [0 0 1])
        (translate thumborigin)
        (translate [3 -4 6])))
@@ -390,7 +390,7 @@
 (defn thumb-tr-place [shape]
   (->> shape
        (rotate (deg2rad   7) [1 0 0])
-       (rotate (deg2rad -10) [0 1 0])
+       (rotate (deg2rad -8) [0 1 0])
        (rotate (deg2rad  13) [0 0 1]) ; original 10
        (translate thumborigin)
        (translate [-16 -8 4]))) ; original 1.5u  (translate [-12 -16 3])
@@ -517,12 +517,14 @@
     (key-place 0 cornerrow web-post-br)
     (thumb-tr-place thumb-post-tl)
     (key-place 1 cornerrow web-post-bl)
-    (thumb-tr-place thumb-post-tr)
+    (translate [0 0 0] (thumb-tr-place thumb-post-tr))
     (key-place 1 cornerrow web-post-br)
     (thumb-ttr-place thumb-post-tl)
-    (key-place 2 cornerrow web-post-bl)
+    ; this is because ttr thumb is so high/angled,
+    ; we need to manually tweak the triangles it a bit
+    (translate [0 -3 0] (key-place 2 cornerrow web-post-bl))
     (thumb-ttr-place thumb-post-tr)
-    (key-place 2 cornerrow web-post-br)
+    (translate [0 -3 0] (key-place 2 cornerrow web-post-br))
     (key-place 3 lastrow web-post-tl)
     (key-place 3 cornerrow web-post-bl)
     (key-place 3 lastrow web-post-tr)
@@ -534,12 +536,13 @@
     (thumb-ttr-place thumb-post-tr)
     (key-place 3 lastrow web-post-tl)
     )
+   ; this section is between ttr thumb and bottom key in col 2
    (triangle-hulls
     (key-place 1 cornerrow web-post-br)
-    (key-place 2 lastrow web-post-tl)
     (key-place 2 cornerrow web-post-bl)
-    (key-place 2 lastrow web-post-tr)
+    (translate [0 -3 0] (key-place 2 cornerrow web-post-bl))
     (key-place 2 cornerrow web-post-br)
+    (translate [0 -3 0] (key-place 2 cornerrow web-post-br))
     (key-place 3 cornerrow web-post-bl))
    (triangle-hulls
     (key-place 3 lastrow web-post-tr)
