@@ -638,29 +638,31 @@
    (wall-brace thumb-br-place  0 -1 web-post-br thumb-br-place  0 -1 web-post-bl)
    (wall-brace thumb-ttr-place  0 -1 web-post-br thumb-ttr-place  0 -1 web-post-bl)
    (wall-brace thumb-bl-place  0 -1 web-post-br thumb-bl-place  0 -1 web-post-bl)
-   (wall-brace thumb-tl-place  0  1 web-post-tr thumb-tl-place  0  1 web-post-tl)
+   ;(wall-brace thumb-tl-place  0  1 web-post-tr thumb-tl-place  0  1 web-post-tl)
    (wall-brace thumb-bl-place -1  0 web-post-tl thumb-bl-place -1  0 web-post-bl)
    (wall-brace thumb-tl-place -1  0 web-post-tl thumb-tl-place -1  0 web-post-bl)
    ; thumb corners
    (wall-brace thumb-bl-place -1  0 web-post-bl thumb-bl-place  0 -1 web-post-bl)
-   (wall-brace thumb-tl-place -1  0 web-post-tl thumb-tl-place  0  1 web-post-tl)
    ; thumb tweeners
    (wall-brace thumb-br-place  0 -1 web-post-bl thumb-bl-place  0 -1 web-post-br)
    (wall-brace thumb-tl-place -1  0 web-post-bl thumb-bl-place -1  0 web-post-tl)
    (wall-brace thumb-tr-place 0  -1 web-post-br thumb-ttr-place 0  -1 web-post-bl)
    (wall-brace thumb-ttr-place  0 -1 thumb-post-br (partial key-place 3 lastrow)  0 -1 web-post-bl)
-   ; clunky bit on the top left thumb connection  (normal connectors don't work well)
+   ; connection between thumb cluster and case
    (bottom-hull
     (left-key-place cornerrow -1 (translate (wall-locate2 -1 0) web-post))
     (left-key-place cornerrow -1 (translate (wall-locate3 -1 0) web-post))
-    (thumb-tl-place (translate (wall-locate2 -0.3 1) web-post-tr))
-    (thumb-tl-place (translate (wall-locate3 -0.3 1) web-post-tr)))
+    (wall-brace thumb-tl-place -1  0 web-post-tl thumb-tl-place  0  1 web-post-tl))
    (hull
     (left-key-place cornerrow -1 (translate (wall-locate2 -1 0) web-post))
     (left-key-place cornerrow -1 (translate (wall-locate3 -1 0) web-post))
-    (thumb-tl-place (translate (wall-locate2 -0.3 1) web-post-tr))
-    (thumb-tl-place (translate (wall-locate3 -0.3 1) web-post-tr))
-    (thumb-tm-place web-post-tl))
+    (thumb-tm-place web-post-tl)
+    (thumb-tl-place web-post-tr))
+   (hull
+    (left-key-place cornerrow -1 (translate (wall-locate2 -1 0) web-post))
+    (left-key-place cornerrow -1 (translate (wall-locate3 -1 0) web-post))
+    (thumb-tl-place web-post-tr)
+    (thumb-tl-place web-post-tl))
    (hull
     (left-key-place cornerrow -1 web-post)
     (left-key-place cornerrow -1 (translate (wall-locate1 -1 0) web-post))
@@ -672,12 +674,8 @@
     (left-key-place cornerrow -1 (translate (wall-locate1 -1 0) web-post))
     (key-place 0 cornerrow web-post-bl)
     (thumb-tm-place web-post-tl))
-   (hull
-    (thumb-tl-place web-post-tr)
-    (thumb-tl-place (translate (wall-locate1 -0.3 1) web-post-tr))
-    (thumb-tl-place (translate (wall-locate2 -0.3 1) web-post-tr))
-    (thumb-tl-place (translate (wall-locate3 -0.3 1) web-post-tr))
-    (thumb-tm-place web-post-tl))))
+   )
+  )
 
 (def usb-holder-ref (key-position 0 0 (map - (wall-locate2  0  -1) [0 (/ mount-height 2) 0])))
 
