@@ -970,6 +970,50 @@
 	;(translate [25 -103 0]))
 )
 
+(defn add-vec  [& args] 
+  "Add two or more vectors together"
+  (when  (seq args) 
+    (apply mapv + args)))
+
+(defn sub-vec  [& args] 
+  "Subtract two or more vectors together"
+  (when  (seq args) 
+    (apply mapv - args)))
+
+(defn div-vec  [& args] 
+  "Divide two or more vectors together"
+  (when  (seq args) 
+    (apply mapv / args)))
+
+
+(def oled-pcb-size [27.35 28.3 plate-thickness])
+(def oled-screen-offset [0 -1 0])
+(def oled-screen-size [24.65 16.65 (+ 0.1 plate-thickness)])
+(def oled-mount-size [23.1 23.75 0.5])
+(def oled-holder
+  (rotate (deg2rad 180) [0 1 0]
+          (difference
+            ; main body
+            (apply cube (add-vec [3 3 0] oled-pcb-size))
+            ; cut for oled pcb
+            (translate [0 0 1] (apply cube (add-vec [0.5 0.5 0.1] oled-pcb-size)))
+            ; cut for oled screen
+            (translate oled-screen-offset (apply cube oled-screen-size))
+            ; cutout for connector pins
+            (->> (cube 10 3 10)
+                 (translate [0 (- (/ (nth oled-pcb-size 1) 2) 2) (+ plate-thickness 0.6)])
+                 )
+            ; cutout for oled cable
+            (->> (cube 10 2 10)
+                 (translate oled-screen-offset)
+                 (translate [0 (- (+ (/ (nth oled-screen-size 1) 2) 1)) (+ plate-thickness 0.6)])
+                 )
+            (for [x [-2 2] y [-2 2]]
+              (translate (div-vec oled-mount-size [x y 1]) (cylinder (/ 2.5 2) 10)))
+            )
+          )
+  )
+
 
 (def model-right (difference
                   (union
