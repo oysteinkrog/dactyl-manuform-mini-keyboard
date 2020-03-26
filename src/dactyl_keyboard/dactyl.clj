@@ -562,14 +562,47 @@
 (defn bottom-hull [& p]
   (hull p (bottom 0.001 p)))
 
-(def left-wall-x-offset 5) ; original 10
-(def left-wall-z-offset  3) ; original 3
+(def left-wall-x-offset 0) ; original 10
+(def left-wall-x-offset-2 15) ; original 10
+(def left-wall-z-offset  0) ; original 3
+
+(defn assoc-at  [data i item]
+  (if  (associative? data)
+    (assoc data i item)
+    (if-not  (neg? i)
+      (letfn  [(assoc-lazy  [i data]
+                 (cond  (zero? i)  (cons item  (rest data))
+                       (empty? data) data
+                       :else  (lazy-seq  (cons  (first data)
+                                               (assoc-lazy  (dec i)  (rest data))))))]
+        (assoc-lazy i data))
+      data)))
 
 (defn left-key-position [row direction]
-  (map - (key-position 0 row [(* mount-width -0.5) (* direction mount-height 0.5) 0]) [left-wall-x-offset 0 left-wall-z-offset]))
+  (map -
+       (key-position 0 row [(* mount-width -0.5) (* direction mount-height 0.5) 0]) 
+       [left-wall-x-offset 0 left-wall-z-offset])
+  )
+
+(defn left-key-position-2 [row direction]
+  (assoc-at (map -
+              (key-position 0 row [(* mount-width -0.5) (* direction mount-height 0.5) 0]) 
+              [left-wall-x-offset-2 0 left-wall-z-offset])
+         2 30
+         )
+  )
 
 (defn left-key-place [row direction shape]
   (translate (left-key-position row direction) shape))
+
+(defn left-key-place-2 [row direction shape]
+  (translate (left-key-position-2 row direction) shape))
+
+(defn oled-position [row direction]
+  (map - (key-position 0 row [(* oled-holder-width -0.5) (* direction oled-holder-height 0.5) 0]) [left-wall-x-offset 0 left-wall-z-offset]))
+
+(defn oled-place [row direction shape]
+  (translate (oled-position row direction) shape))
 
 (defn wall-locate1 [dx dy] [(* dx wall-thickness) (* dy wall-thickness) -1])
 (defn wall-locate2 [dx dy] [(* dx wall-xy-offset) (* dy wall-xy-offset) wall-z-offset])
@@ -590,7 +623,8 @@
     (place1 (translate (wall-locate2 dx1 dy1) post1))
     (place1 (translate (wall-locate3 dx1 dy1) post1))
     (place2 (translate (wall-locate2 dx2 dy2) post2))
-    (place2 (translate (wall-locate3 dx2 dy2) post2)))))
+    (place2 (translate (wall-locate3 dx2 dy2) post2))))
+  )
 
 (defn key-wall-brace [x1 y1 dx1 dy1 post1 x2 y2 dx2 dy2 post2]
   (wall-brace (partial key-place x1 y1) dx1 dy1 post1
@@ -606,18 +640,32 @@
 
 (def left-wall
   (union
-    (for [y (range 0 lastrow)] (union (wall-brace (partial left-key-place y 1)       -1 0 web-post (partial left-key-place y -1) -1 0 web-post)
-                                      (hull (key-place 0 y web-post-tl)
-                                            (key-place 0 y web-post-bl)
-                                            (left-key-place y  1 web-post)
-                                            (left-key-place y -1 web-post))))
-    (for [y (range 1 lastrow)] (union (wall-brace (partial left-key-place (dec y) -1) -1 0 web-post (partial left-key-place y  1) -1 0 web-post)
-                                      (hull (key-place 0 y       web-post-tl)
-                                            (key-place 0 (dec y) web-post-bl)
-                                            (left-key-place y        1 web-post)
-                                            (left-key-place (dec y) -1 web-post))))
-    (wall-brace  (partial key-place 0 0) 0 1 web-post-tl  (partial left-key-place 0 1) 0 1 web-post)
-    (wall-brace  (partial left-key-place 0 1) 0 1 web-post  (partial left-key-place 0 1) -1 0 web-post)
+    (for [y (range 0 lastrow)] (union 
+                                 (wall-brace (partial left-key-place-2 y 1)       -1 0 web-post (partial left-key-place-2 y -1) -1 0 web-post)
+                                 (hull (key-place 0 y web-post-tl)
+                                       (key-place 0 y web-post-bl)
+                                       (left-key-place y  1 web-post)
+                                       (left-key-place y -1 web-post))
+                                 (hull (left-key-place y 1 web-post)
+                                       (left-key-place y -1 web-post)
+                                       (left-key-place-2 y  1 web-post)
+                                       (left-key-place-2 y -1 web-post))
+                                 )
+      )
+    (for [y (range 1 lastrow)] (union 
+                                 (wall-brace (partial left-key-place-2 (dec y) -1) -1 0 web-post (partial left-key-place-2 y  1) -1 0 web-post)
+                                 (hull (key-place 0 y       web-post-tl)
+                                       (key-place 0 (dec y) web-post-bl)
+                                       (left-key-place y        1 web-post)
+                                       (left-key-place (dec y) -1 web-post))
+                                 (hull (left-key-place y 1       web-post)
+                                       (left-key-place (dec y) -1 web-post)
+                                       (left-key-place-2 y        1 web-post)
+                                       (left-key-place-2 (dec y) -1 web-post))
+                                 )
+      )
+    (wall-brace  (partial key-place 0 0) 0 1 web-post-tl  (partial left-key-place-2 0 1) 0 1 web-post)
+    (wall-brace  (partial left-key-place-2 0 1) 0 1 web-post  (partial left-key-place-2 0 1) -1 0 web-post)
     )
   )
 
@@ -650,29 +698,32 @@
    (wall-brace thumb-ttr-place  0 -1 thumb-post-br (partial key-place 3 lastrow)  0 -1 web-post-bl)
    ; connection between thumb cluster and case
    (bottom-hull
-    (left-key-place cornerrow -1 (translate (wall-locate2 -1 0) web-post))
-    (left-key-place cornerrow -1 (translate (wall-locate3 -1 0) web-post))
+    (left-key-place-2 cornerrow -1 (translate (wall-locate2 -1 0) web-post))
+    (left-key-place-2 cornerrow -1 (translate (wall-locate3 -1 0) web-post))
     (wall-brace thumb-tl-place -1  0 web-post-tl thumb-tl-place  0  1 web-post-tl))
    (hull
-    (left-key-place cornerrow -1 (translate (wall-locate2 -1 0) web-post))
-    (left-key-place cornerrow -1 (translate (wall-locate3 -1 0) web-post))
+    (left-key-place-2 cornerrow -1 (translate (wall-locate2 -1 0) web-post))
+    (left-key-place-2 cornerrow -1 (translate (wall-locate3 -1 0) web-post))
     (thumb-tm-place web-post-tl)
     (thumb-tl-place web-post-tr))
    (hull
-    (left-key-place cornerrow -1 (translate (wall-locate2 -1 0) web-post))
-    (left-key-place cornerrow -1 (translate (wall-locate3 -1 0) web-post))
+    (left-key-place-2 cornerrow -1 (translate (wall-locate2 -1 0) web-post))
+    (left-key-place-2 cornerrow -1 (translate (wall-locate3 -1 0) web-post))
     (thumb-tl-place web-post-tr)
     (thumb-tl-place web-post-tl))
    (hull
-    (left-key-place cornerrow -1 web-post)
-    (left-key-place cornerrow -1 (translate (wall-locate1 -1 0) web-post))
-    (left-key-place cornerrow -1 (translate (wall-locate2 -1 0) web-post))
-    (left-key-place cornerrow -1 (translate (wall-locate3 -1 0) web-post))
+    (left-key-place-2 cornerrow -1 web-post)
+    (left-key-place-2 cornerrow -1 (translate (wall-locate1 -1 0) web-post))
+    (left-key-place-2 cornerrow -1 (translate (wall-locate2 -1 0) web-post))
+    (left-key-place-2 cornerrow -1 (translate (wall-locate3 -1 0) web-post))
     (thumb-tm-place web-post-tl))
    (hull
     (left-key-place cornerrow -1 web-post)
-    (left-key-place cornerrow -1 (translate (wall-locate1 -1 0) web-post))
     (key-place 0 cornerrow web-post-bl)
+    (thumb-tm-place web-post-tl))
+   (hull
+    (left-key-place cornerrow -1 web-post)
+    (left-key-place-2 cornerrow -1 web-post)
     (thumb-tm-place web-post-tl))
    )
   )
