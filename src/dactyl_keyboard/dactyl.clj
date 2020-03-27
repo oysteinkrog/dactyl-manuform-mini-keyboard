@@ -133,6 +133,19 @@
       ;(rotate (/ π 2) [0 0 1]))
      )))
 
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; OLED screen holder ;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+(def oled-pcb-size [27.35 28.3 plate-thickness])
+(def oled-screen-offset [0 -1 0])
+(def oled-screen-size [24.65 16.65 (+ 0.1 plate-thickness)])
+(def oled-mount-size [23.1 23.75 0.5])
+(def oled-holder-width (+ 3 (nth oled-pcb-size 0)))
+(def oled-holder-height (+ 3 (nth oled-pcb-size 1)))
+(def oled-holder-size [oled-holder-width oled-holder-height plate-thickness])
+(def oled-mount-rotation (deg2rad 15))
+
 ;;;;;;;;;;;;;;;;
 ;; SA Keycaps ;;
 ;;;;;;;;;;;;;;;;
@@ -551,6 +564,53 @@
     (key-place 4 cornerrow web-post-bl))))
 
 ;;;;;;;;;;
+;; OLED ;;
+;;;;;;;;;;
+
+(defn add-vec  [& args]
+  "Add two or more vectors together"
+  (when  (seq args) 
+    (apply mapv + args)))
+
+(defn sub-vec  [& args]
+  "Subtract two or more vectors together"
+  (when  (seq args) 
+    (apply mapv - args)))
+
+(defn div-vec  [& args]
+  "Divide two or more vectors together"
+  (when  (seq args) 
+    (apply mapv / args)))
+
+
+(def oled-holder
+  (->>
+    (difference
+      ; main body
+      (apply cube oled-holder-size)
+      ; cut for oled pcb
+      (translate [0 0 1] (apply cube (add-vec [0.5 0.5 0.1] oled-pcb-size)))
+      ; cut for oled screen
+      (translate oled-screen-offset (apply cube oled-screen-size))
+      ; cutout for connector pins
+      (->> (cube 10 3 10)
+           (translate [0 (- (/ (nth oled-pcb-size 1) 2) 2) (+ plate-thickness 0.8)])
+           )
+      ; cutout for oled cable
+      (->> (cube 10 2 10)
+           (translate oled-screen-offset)
+           (translate [0 (- (+ (/ (nth oled-screen-size 1) 2) 1)) (+ plate-thickness 0.8)])
+           )
+      (for [x [-2 2] y [-2 2]]
+        (translate (div-vec oled-mount-size [x y 1]) (cylinder (/ 2.5 2) 10)))
+      )
+    (rotate (deg2rad 180) [0 1 0])
+    (rotate oled-mount-rotation [1 0 0])
+    (translate [0 0 (/ plate-thickness 2)])
+    )
+  )
+
+;;;;;;;;;;
 ;; Case ;;
 ;;;;;;;;;;
 
@@ -584,7 +644,7 @@
        [left-wall-x-offset 0 left-wall-z-offset])
   )
 
-(defn left-key-position-2 [row direction]
+(defn left-wall-position [row direction]
   (assoc-at (map -
               (key-position 0 row [(* mount-width -0.5) (* direction mount-height 0.5) 0]) 
               [left-wall-x-offset-2 0 left-wall-z-offset])
@@ -592,17 +652,26 @@
          )
   )
 
-(defn left-key-place [row direction shape]
-  (translate (left-key-position row direction) shape))
+(defn left-wall-place [row direction shape]
+  (translate (left-wall-position row direction) shape))
 
-(defn left-key-place-2 [row direction shape]
-  (translate (left-key-position-2 row direction) shape))
+(defn left-wall-plate-position [xdir ydir]
+  (rotate-around-x oled-mount-rotation
+                   (add-vec
+                     [left-wall-x-offset 0 left-wall-z-offset]
+                     (key-position 0 0 [0 0 0])
+                     [(* mount-width -0.5) (* mount-width 0.5) 0]
+                     [(* oled-holder-width -0.5) (* oled-holder-height -0.5) 0]
+                     [(* xdir oled-holder-width 0.5) (* ydir oled-holder-height 0.5) 0]
+                     [-3 8 -6]
+                     ))
+  )
 
-(defn oled-position [row direction]
-  (map - (key-position 0 row [(* oled-holder-width -0.5) (* direction oled-holder-height 0.5) 0]) [left-wall-x-offset 0 left-wall-z-offset]))
-
-(defn oled-place [row direction shape]
-  (translate (oled-position row direction) shape))
+(defn left-wall-plate-place [xdir ydir shape]
+  (->> shape
+       (translate (left-wall-plate-position xdir ydir))
+       )
+  )
 
 (defn wall-locate1 [dx dy] [(* dx wall-thickness) (* dy wall-thickness) -1])
 (defn wall-locate2 [dx dy] [(* dx wall-xy-offset) (* dy wall-xy-offset) wall-z-offset])
@@ -640,32 +709,50 @@
 
 (def left-wall
   (union
-    (for [y (range 0 lastrow)] (union 
-                                 (wall-brace (partial left-key-place-2 y 1)       -1 0 web-post (partial left-key-place-2 y -1) -1 0 web-post)
-                                 (hull (key-place 0 y web-post-tl)
-                                       (key-place 0 y web-post-bl)
-                                       (left-key-place y  1 web-post)
-                                       (left-key-place y -1 web-post))
-                                 (hull (left-key-place y 1 web-post)
-                                       (left-key-place y -1 web-post)
-                                       (left-key-place-2 y  1 web-post)
-                                       (left-key-place-2 y -1 web-post))
-                                 )
+    (wall-brace  (partial key-place 0 0) 0 1 web-post-tl  (partial left-wall-plate-place 1 1) 0 1 web-post)
+    (wall-brace  (partial left-wall-plate-place 1 1) 0 1 web-post  (partial left-wall-plate-place -1 1) 0 1 web-post)
+    (wall-brace  (partial left-wall-plate-place -1 1) 0 1 web-post  (partial left-wall-plate-place -1 1) -1 0 web-post)
+    (wall-brace  (partial left-wall-plate-place -1 1) -1 0 web-post  (partial left-wall-plate-place -1 -1) -1 -1 web-post)
+    (left-wall-plate-place 0 0 oled-holder)
+    ;(-# (left-wall-plate-place 0 0 (cube 1 1 1)))
+    ;(for [x [-1 1] y [-1 1]] (-# (left-wall-plate-place x y (cube 1 1 plate-thickness))))
+
+    (wall-brace  (partial left-wall-plate-place -1 -1) -1 -1 web-post  thumb-tl-place -1 0 web-post-tl)
+    (wall-brace  thumb-tl-place -1 0 web-post-tl thumb-tl-place -1 0 web-post-bl)
+
+    (triangle-hulls
+      (left-wall-plate-place 1 1 web-post)
+      (key-place 0 0 web-post-tl)
+      (left-wall-plate-place 1 -1 web-post)
+
+      (key-place 0 1 web-post-tl)
+      (left-wall-plate-place 1 -1 web-post)
+      (key-place 0 1 web-post-bl)
+
+      (left-wall-plate-place 1 -1 web-post)
+      (left-wall-plate-place -1 -1 web-post)
+      (thumb-tl-place web-post-tl)
+
+      (key-place 0 1 web-post-bl)
+      (thumb-tl-place web-post-tl)
+      (left-wall-plate-place 1 -1 web-post)
+
+      (key-place 0 1 web-post-bl)
+      (thumb-tl-place web-post-tl)
+      (thumb-tm-place web-post-tl)
+
+      (key-place 0 1 web-post-bl)
+      (key-place 0 2 web-post-tl)
+      (thumb-tm-place web-post-tl)
+
+      (thumb-tl-place web-post-tl)
+      (thumb-tl-place web-post-tr)
+      (thumb-tm-place web-post-tl)
+
+      (thumb-tm-place web-post-tl)
+      (key-place 0 2 web-post-tl)
+      (key-place 0 2 web-post-bl)
       )
-    (for [y (range 1 lastrow)] (union 
-                                 (wall-brace (partial left-key-place-2 (dec y) -1) -1 0 web-post (partial left-key-place-2 y  1) -1 0 web-post)
-                                 (hull (key-place 0 y       web-post-tl)
-                                       (key-place 0 (dec y) web-post-bl)
-                                       (left-key-place y        1 web-post)
-                                       (left-key-place (dec y) -1 web-post))
-                                 (hull (left-key-place y 1       web-post)
-                                       (left-key-place (dec y) -1 web-post)
-                                       (left-key-place-2 y        1 web-post)
-                                       (left-key-place-2 (dec y) -1 web-post))
-                                 )
-      )
-    (wall-brace  (partial key-place 0 0) 0 1 web-post-tl  (partial left-key-place-2 0 1) 0 1 web-post)
-    (wall-brace  (partial left-key-place-2 0 1) 0 1 web-post  (partial left-key-place-2 0 1) -1 0 web-post)
     )
   )
 
@@ -696,35 +783,6 @@
    (wall-brace thumb-tl-place -1  0 web-post-bl thumb-bl-place -1  0 web-post-tl)
    (wall-brace thumb-tr-place 0  -1 web-post-br thumb-ttr-place 0  -1 web-post-bl)
    (wall-brace thumb-ttr-place  0 -1 thumb-post-br (partial key-place 3 lastrow)  0 -1 web-post-bl)
-   ; connection between thumb cluster and case
-   (bottom-hull
-    (left-key-place-2 cornerrow -1 (translate (wall-locate2 -1 0) web-post))
-    (left-key-place-2 cornerrow -1 (translate (wall-locate3 -1 0) web-post))
-    (wall-brace thumb-tl-place -1  0 web-post-tl thumb-tl-place  0  1 web-post-tl))
-   (hull
-    (left-key-place-2 cornerrow -1 (translate (wall-locate2 -1 0) web-post))
-    (left-key-place-2 cornerrow -1 (translate (wall-locate3 -1 0) web-post))
-    (thumb-tm-place web-post-tl)
-    (thumb-tl-place web-post-tr))
-   (hull
-    (left-key-place-2 cornerrow -1 (translate (wall-locate2 -1 0) web-post))
-    (left-key-place-2 cornerrow -1 (translate (wall-locate3 -1 0) web-post))
-    (thumb-tl-place web-post-tr)
-    (thumb-tl-place web-post-tl))
-   (hull
-    (left-key-place-2 cornerrow -1 web-post)
-    (left-key-place-2 cornerrow -1 (translate (wall-locate1 -1 0) web-post))
-    (left-key-place-2 cornerrow -1 (translate (wall-locate2 -1 0) web-post))
-    (left-key-place-2 cornerrow -1 (translate (wall-locate3 -1 0) web-post))
-    (thumb-tm-place web-post-tl))
-   (hull
-    (left-key-place cornerrow -1 web-post)
-    (key-place 0 cornerrow web-post-bl)
-    (thumb-tm-place web-post-tl))
-   (hull
-    (left-key-place cornerrow -1 web-post)
-    (left-key-place-2 cornerrow -1 web-post)
-    (thumb-tm-place web-post-tl))
    )
   )
 
@@ -737,7 +795,7 @@
 
 (def usb-jack (translate (map + usb-holder-position [0 10 4]) (cube 12.1 20 6)))
 
-(def pro-micro-position (map + (key-position 0 1 (wall-locate3 -1 0)) [-3 15 -13]))
+(def pro-micro-position (add-vec (left-wall-position 0 -1) (wall-locate3 -1 0) [-10 15 -13]))
 (def pro-micro-space-size [4 10 10]) ; z has no wall;
 (def pro-micro-wall-thickness 3)
 (def pro-micro-holder-size [(+ pro-micro-wall-thickness (first pro-micro-space-size)) (+ pro-micro-wall-thickness (second pro-micro-space-size)) (last pro-micro-space-size)])
@@ -797,7 +855,7 @@
         shift-down    (and (not (or shift-right shift-left)) (>= row lastrow))
         position      (if shift-up     (key-position column row (map + (wall-locate2  0  1) [0 (/ mount-height 2) 0]))
                           (if shift-down  (key-position column row (map - (wall-locate2  0 -1) [0 (/ mount-height 2) 0]))
-                              (if shift-left (map + (left-key-position row 0) (wall-locate3 -1 0))
+                              (if shift-left (map + (left-wall-plate-position -1 1) (wall-locate3 -1 0))
                                   (key-position column row (map + (wall-locate2  1  0) [(/ mount-width 2) 0 0])))))]
     (->> (screw-insert-shape bottom-radius top-radius height)
          (translate (map + offset [(first position) (second position) (/ height 2)])))))
@@ -805,19 +863,19 @@
 (defn screw-insert-all-shapes [bottom-radius top-radius height]
   (union 
          ; near usb/trss holes
-         (screw-insert 0 0         bottom-radius top-radius height [8 9 0])
-         ; thumb cluster left
-         (screw-insert 0 lastrow   bottom-radius top-radius height [3 6 0])
+         (screw-insert 0 0         bottom-radius top-radius height [14 3 0])
          ; middle top
-         (screw-insert 3 lastrow         bottom-radius top-radius height [-7 1 0])
-         ; thumb cluster, closest to user
-         (screw-insert 1 lastrow         bottom-radius top-radius height [-3 -14 0])
+         (screw-insert 3 0         bottom-radius top-radius height [-9 -2 0])
+         ; top right
+         (screw-insert lastcol 0         bottom-radius top-radius height [-4 7 0])
          ; lower right
          (screw-insert lastcol lastrow  bottom-radius top-radius height [-4 14 0])
          ; middle bottom
-         (screw-insert 3 0         bottom-radius top-radius height [-9 -3 0])
-         ; top right
-         (screw-insert lastcol 0         bottom-radius top-radius height [-4 7 0])
+         (screw-insert 3 lastrow         bottom-radius top-radius height [-5 2 0])
+         ; thumb cluster, closest to user
+         (screw-insert 1 lastrow         bottom-radius top-radius height [-2 -13 0])
+         ; thumb cluster left
+         (screw-insert 0 lastrow   bottom-radius top-radius height [20 -80 0])
 ))
 
 ; Hole Depth Y: 4.4
@@ -1020,51 +1078,6 @@
 
 	;(translate [25 -103 0]))
 )
-
-(defn add-vec  [& args] 
-  "Add two or more vectors together"
-  (when  (seq args) 
-    (apply mapv + args)))
-
-(defn sub-vec  [& args] 
-  "Subtract two or more vectors together"
-  (when  (seq args) 
-    (apply mapv - args)))
-
-(defn div-vec  [& args] 
-  "Divide two or more vectors together"
-  (when  (seq args) 
-    (apply mapv / args)))
-
-
-(def oled-pcb-size [27.35 28.3 plate-thickness])
-(def oled-screen-offset [0 -1 0])
-(def oled-screen-size [24.65 16.65 (+ 0.1 plate-thickness)])
-(def oled-mount-size [23.1 23.75 0.5])
-(def oled-holder
-  (rotate (deg2rad 180) [0 1 0]
-          (difference
-            ; main body
-            (apply cube (add-vec [3 3 0] oled-pcb-size))
-            ; cut for oled pcb
-            (translate [0 0 1] (apply cube (add-vec [0.5 0.5 0.1] oled-pcb-size)))
-            ; cut for oled screen
-            (translate oled-screen-offset (apply cube oled-screen-size))
-            ; cutout for connector pins
-            (->> (cube 10 3 10)
-                 (translate [0 (- (/ (nth oled-pcb-size 1) 2) 2) (+ plate-thickness 0.6)])
-                 )
-            ; cutout for oled cable
-            (->> (cube 10 2 10)
-                 (translate oled-screen-offset)
-                 (translate [0 (- (+ (/ (nth oled-screen-size 1) 2) 1)) (+ plate-thickness 0.6)])
-                 )
-            (for [x [-2 2] y [-2 2]]
-              (translate (div-vec oled-mount-size [x y 1]) (cylinder (/ 2.5 2) 10)))
-            )
-          )
-  )
-
 
 (def model-right (difference
                   (union
