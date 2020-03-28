@@ -143,8 +143,10 @@
 (def oled-mount-size [23.1 23.75 0.5])
 (def oled-holder-width (+ 3 (nth oled-pcb-size 0)))
 (def oled-holder-height (+ 3 (nth oled-pcb-size 1)))
-(def oled-holder-size [oled-holder-width oled-holder-height plate-thickness])
-(def oled-mount-rotation (deg2rad 15))
+(def oled-holder-thickness plate-thickness)
+(def oled-holder-size [oled-holder-width oled-holder-height oled-holder-thickness])
+(def oled-mount-rotation-x (deg2rad 15))
+(def oled-mount-rotation-z (deg2rad -3))
 
 ;;;;;;;;;;;;;;;;
 ;; SA Keycaps ;;
@@ -299,6 +301,13 @@
     [(- (Math/sin angle)) 0 (Math/cos angle)]]
    position))
 
+(defn rotate-around-z [angle position]
+  (mmul
+    [[(Math/cos angle) (- (Math/sin angle)) 0]
+     [(Math/sin angle) (Math/cos angle) 0]
+     [0                    0 1]]
+   position))
+
 (defn key-position [column row position]
   (apply-key-geometry (partial map +) rotate-around-x rotate-around-y column row position))
 
@@ -327,8 +336,15 @@
 (def web-thickness 3)
 (def post-size 0.1)
 (def web-post (->> (cube post-size post-size web-thickness)
-                   (translate [0 0 (+ (/ web-thickness -2)
-                                      plate-thickness)])))
+                   (translate [0 0 (+ (/ web-thickness -2) plate-thickness)])
+                   ))
+
+(def oled-post (->> (cube post-size post-size oled-holder-thickness)
+                   (rotate oled-mount-rotation-x [1 0 0])
+                   (rotate oled-mount-rotation-z [0 0 1])
+                   (translate [0 0 oled-holder-thickness])
+                   )
+  )
 
 (def post-adj (/ post-size 2))
 (def web-post-tr (translate [(- (/ mount-width 2) post-adj) (- (/ mount-height 2) post-adj) 0] web-post))
@@ -594,7 +610,7 @@
       (translate oled-screen-offset (apply cube oled-screen-size))
       ; cutout for connector pins
       (->> (cube 10 3 10)
-           (translate [0 (- (/ (nth oled-pcb-size 1) 2) 2) (+ plate-thickness 0.8)])
+           (translate [0 (- (/ (nth oled-pcb-size 1) 2) 2) (+ plate-thickness 1.0)])
            )
       ; cutout for oled cable
       (->> (cube 10 2 10)
@@ -605,8 +621,9 @@
         (translate (div-vec oled-mount-size [x y 1]) (cylinder (/ 2.5 2) 10)))
       )
     (rotate (deg2rad 180) [0 1 0])
-    (rotate oled-mount-rotation [1 0 0])
-    (translate [0 0 (/ plate-thickness 2)])
+    (rotate oled-mount-rotation-z [0 0 1])
+    (rotate oled-mount-rotation-x [1 0 0])
+    (translate [0 0 oled-holder-thickness])
     )
   )
 
@@ -623,8 +640,7 @@
   (hull p (bottom 0.001 p)))
 
 (def left-wall-x-offset 0) ; original 10
-(def left-wall-x-offset-2 15) ; original 10
-(def left-wall-z-offset  0) ; original 3
+(def left-wall-z-offset 0) ; original 3
 
 (defn assoc-at  [data i item]
   (if  (associative? data)
@@ -644,27 +660,19 @@
        [left-wall-x-offset 0 left-wall-z-offset])
   )
 
-(defn left-wall-position [row direction]
-  (assoc-at (map -
-              (key-position 0 row [(* mount-width -0.5) (* direction mount-height 0.5) 0]) 
-              [left-wall-x-offset-2 0 left-wall-z-offset])
-         2 30
-         )
-  )
-
-(defn left-wall-place [row direction shape]
-  (translate (left-wall-position row direction) shape))
-
 (defn left-wall-plate-position [xdir ydir]
-  (rotate-around-x oled-mount-rotation
-                   (add-vec
-                     [left-wall-x-offset 0 left-wall-z-offset]
-                     (key-position 0 0 [0 0 0])
-                     [(* mount-width -0.5) (* mount-width 0.5) 0]
-                     [(* oled-holder-width -0.5) (* oled-holder-height -0.5) 0]
-                     [(* xdir oled-holder-width 0.5) (* ydir oled-holder-height 0.5) 0]
-                     [-3 8 -6]
-                     ))
+  (->> 
+    (add-vec
+      [left-wall-x-offset 0 left-wall-z-offset]
+      (key-position 0 0 [0 0 0])
+      [(* mount-width -0.5) (* mount-width 0.5) 0]
+      [(* oled-holder-width -0.5) (* oled-holder-height -0.5) 0]
+      [(* xdir oled-holder-width 0.5) (* ydir oled-holder-height 0.5) 0]
+      [-3 6 -10]
+      )
+    (rotate-around-z oled-mount-rotation-z)
+    (rotate-around-x oled-mount-rotation-x)
+    )
   )
 
 (defn left-wall-plate-place [xdir ydir shape]
@@ -709,49 +717,58 @@
 
 (def left-wall
   (union
-    (wall-brace  (partial key-place 0 0) 0 1 web-post-tl  (partial left-wall-plate-place 1 1) 0 1 web-post)
-    (wall-brace  (partial left-wall-plate-place 1 1) 0 1 web-post  (partial left-wall-plate-place -1 1) 0 1 web-post)
-    (wall-brace  (partial left-wall-plate-place -1 1) 0 1 web-post  (partial left-wall-plate-place -1 1) -1 0 web-post)
-    (wall-brace  (partial left-wall-plate-place -1 1) -1 0 web-post  (partial left-wall-plate-place -1 -1) -1 -1 web-post)
+    (wall-brace  (partial key-place 0 0) 0 1 web-post-tl  (partial left-wall-plate-place 1 1) 0 1 oled-post)
+    (wall-brace  (partial left-wall-plate-place 1 1) 0 1 oled-post  (partial left-wall-plate-place -1 1) 0 1 oled-post)
+    (wall-brace  (partial left-wall-plate-place -1 1) 0 1 oled-post  (partial left-wall-plate-place -1 1) -1 0 oled-post)
+    (wall-brace  (partial left-wall-plate-place -1 1) -1 0 oled-post  (partial left-wall-plate-place -1 -1) -1 -1 oled-post)
     (left-wall-plate-place 0 0 oled-holder)
     ;(-# (left-wall-plate-place 0 0 (cube 1 1 1)))
-    ;(for [x [-1 1] y [-1 1]] (-# (left-wall-plate-place x y (cube 1 1 plate-thickness))))
+    (for [x [-1 1] y [-1 1]] (-# (left-wall-plate-place x y oled-post)))
 
-    (wall-brace  (partial left-wall-plate-place -1 -1) -1 -1 web-post  thumb-tl-place -1 0 web-post-tl)
+    (wall-brace  (partial left-wall-plate-place -1 -1) -1 -1 oled-post  thumb-tl-place -1 0 web-post-tl)
     (wall-brace  thumb-tl-place -1 0 web-post-tl thumb-tl-place -1 0 web-post-bl)
 
     (triangle-hulls
-      (left-wall-plate-place 1 1 web-post)
+      (left-wall-plate-place 1 1 oled-post)
       (key-place 0 0 web-post-tl)
-      (left-wall-plate-place 1 -1 web-post)
+      (key-place 0 0 web-post-bl)
 
+      (key-place 0 0 web-post-bl)
+      (left-wall-plate-place 1 1 oled-post)
+      (left-wall-plate-place 1 -1 oled-post)
+
+      (left-wall-plate-place 1 -1 oled-post)
+      (left-wall-plate-place -1 -1 oled-post)
+      (thumb-tl-place web-post-tl)
+
+      (thumb-tl-place web-post-tl)
+      (left-wall-plate-place -1 -1 oled-post)
+      (left-wall-plate-place 1 -1 oled-post)
+
+      (left-wall-plate-place 1 -1 oled-post)
       (key-place 0 1 web-post-tl)
-      (left-wall-plate-place 1 -1 web-post)
       (key-place 0 1 web-post-bl)
 
-      (left-wall-plate-place 1 -1 web-post)
-      (left-wall-plate-place -1 -1 web-post)
-      (thumb-tl-place web-post-tl)
-
       (key-place 0 1 web-post-bl)
+      (left-wall-plate-place 1 -1 oled-post)
       (thumb-tl-place web-post-tl)
-      (left-wall-plate-place 1 -1 web-post)
-
-      (key-place 0 1 web-post-bl)
-      (thumb-tl-place web-post-tl)
-      (thumb-tm-place web-post-tl)
 
       (key-place 0 1 web-post-bl)
       (key-place 0 2 web-post-tl)
-      (thumb-tm-place web-post-tl)
+      (thumb-tl-place web-post-tl)
 
       (thumb-tl-place web-post-tl)
       (thumb-tl-place web-post-tr)
+
       (thumb-tm-place web-post-tl)
 
       (thumb-tm-place web-post-tl)
+      (thumb-tl-place web-post-tl)
+      (key-place 0 2 web-post-tl)
+
       (key-place 0 2 web-post-tl)
       (key-place 0 2 web-post-bl)
+      (thumb-tm-place web-post-tl)
       )
     )
   )
@@ -788,14 +805,14 @@
 
 (def usb-holder-ref (key-position 0 0 (map - (wall-locate2  0  -1) [0 (/ mount-height 2) 0])))
 
-(def usb-holder-position (map + [0 19.3 0] [(first usb-holder-ref) (second usb-holder-ref) 2]))
+(def usb-holder-position (map + [8 19.3 0] [(first usb-holder-ref) (second usb-holder-ref) 2]))
 (def usb-holder-cube   (cube 15 12 4))
 (def usb-holder-space  (translate (map + usb-holder-position [0 (* -1 wall-thickness) 1]) usb-holder-cube))
 (def usb-holder-holder (translate usb-holder-position (cube 19 15 4)))
 
 (def usb-jack (translate (map + usb-holder-position [0 10 4]) (cube 12.1 20 6)))
 
-(def pro-micro-position (add-vec (left-wall-position 0 -1) (wall-locate3 -1 0) [-10 15 -13]))
+(def pro-micro-position (add-vec (left-wall-plate-position -1 -1) (wall-locate3 -1 0) [9 25 -13]))
 (def pro-micro-space-size [4 10 10]) ; z has no wall;
 (def pro-micro-wall-thickness 3)
 (def pro-micro-holder-size [(+ pro-micro-wall-thickness (first pro-micro-space-size)) (+ pro-micro-wall-thickness (second pro-micro-space-size)) (last pro-micro-space-size)])
