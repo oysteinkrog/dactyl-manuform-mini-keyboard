@@ -812,7 +812,7 @@
 
 (def usb-jack (translate (map + usb-holder-position [0 10 4]) (cube 12.1 20 6)))
 
-(def pro-micro-position (add-vec (left-wall-plate-position -1 -1) (wall-locate3 -1 0) [9 25 -13]))
+(def pro-micro-position (add-vec (left-wall-plate-position -1 -1) (wall-locate3 -1 0) [6 25 -9]))
 (def pro-micro-space-size [4 10 10]) ; z has no wall;
 (def pro-micro-wall-thickness 3)
 (def pro-micro-holder-size [(+ pro-micro-wall-thickness (first pro-micro-space-size)) (+ pro-micro-wall-thickness (second pro-micro-space-size)) (last pro-micro-space-size)])
@@ -894,7 +894,7 @@
          ; thumb cluster, closest to user
          (screw-insert 1 lastrow         bottom-radius top-radius height [-2 -13 0])
          ; thumb cluster left
-         (screw-insert 0 lastrow   bottom-radius top-radius height [20 -80 0])
+         (screw-insert 0 lastrow   bottom-radius top-radius height [16 -80 0])
 ))
 
 ; Hole Depth Y: 4.4
