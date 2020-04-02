@@ -872,11 +872,11 @@
          ; near usb/trss holes
          (screw-insert 0 0         bottom-radius top-radius height [4 -1 0])
          ; middle top
-         (screw-insert 3 0         bottom-radius top-radius height [-9 -2 0])
+         (screw-insert 3 0         bottom-radius top-radius height [-9 0 0])
          ; top right
-         (screw-insert lastcol 0         bottom-radius top-radius height [-4 7 0])
+         (screw-insert lastcol 0         bottom-radius top-radius height [-4 9 0])
          ; lower right
-         (screw-insert lastcol lastrow  bottom-radius top-radius height [-4 14 0])
+         (screw-insert lastcol lastrow  bottom-radius top-radius height [-4 13 0])
          ; middle bottom
          (screw-insert 3 lastrow         bottom-radius top-radius height [-5 2 0])
          ; thumb cluster, closest to user
