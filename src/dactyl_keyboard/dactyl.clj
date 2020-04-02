@@ -352,6 +352,11 @@
 (def web-post-bl (translate [(+ (/ mount-width -2) post-adj) (+ (/ mount-height -2) post-adj) 0] web-post))
 (def web-post-br (translate [(- (/ mount-width 2) post-adj) (+ (/ mount-height -2) post-adj) 0] web-post))
 
+(defn web-post-tr-e [x y] (translate [(- (/ mount-width 2) (+ post-adj x)) (- (/ mount-height 2) (+ post-adj y)) 0] web-post))
+(defn web-post-tl-e [x y] (translate [(+ (/ mount-width -2) (+ post-adj x)) (- (/ mount-height 2) (+ post-adj y)) 0] web-post))
+(defn web-post-bl-e [x y] (translate [(+ (/ mount-width -2) (+ post-adj x)) (+ (/ mount-height -2) (+ post-adj y)) 0] web-post))
+(defn web-post-br-e [x y] (translate [(- (/ mount-width 2) (+ post-adj x)) (+ (/ mount-height -2) (+ post-adj y)) 0] web-post))
+
 ; wide posts for 1.5u keys in the main cluster
 
 (if (true? pinky-15u)
@@ -539,45 +544,78 @@
     (thumb-tm-place web-post-bl)
     (thumb-tm-place web-post-br)
     (thumb-br-place web-post-tr))
+   (for [column (range 0 3)]
+     (triangle-hulls
+       (key-place column cornerrow (web-post-bl-e 0 -2))
+       (key-place column cornerrow web-post-bl)
+       (key-place column cornerrow (web-post-br-e 0 -2))
+       (key-place column cornerrow web-post-br)
+       )
+     )
+   (for [column (range 0 3)]
+     (triangle-hulls
+       (key-place (inc column) cornerrow (web-post-bl-e 0 -2))
+       (key-place (inc column) cornerrow web-post-bl)
+       (key-place column cornerrow (web-post-br-e 0 -2))
+       (key-place column cornerrow web-post-br)
+       )
+     )
+   ;(triangle-hulls
+    ;(key-place 0 cornerrow (web-post-bl-e 0 -2))
+    ;(key-place 0 cornerrow web-post-bl)
+    ;(key-place 0 cornerrow (web-post-br-e 0 -2))
+    ;(key-place 0 cornerrow web-post-br)
+     ;)
+     (triangle-hulls
+       (thumb-tm-place web-post-tl)
+       (key-place 0 cornerrow web-post-bl)
+       (key-place 0 cornerrow (web-post-bl-e 0 -2))
+    )
    (triangle-hulls    ; top two to the main keyboard, starting on the left
     (thumb-tm-place web-post-tl)
-    (key-place 0 cornerrow web-post-bl)
+    (key-place 0 cornerrow (web-post-bl-e 0 -2))
     (thumb-tm-place web-post-tr)
-    (key-place 0 cornerrow web-post-br)
+    (key-place 0 cornerrow (web-post-br-e 0 -2))
     (thumb-tr-place thumb-post-tl)
-    (key-place 1 cornerrow web-post-bl)
-    (translate [0 0 0] (thumb-tr-place thumb-post-tr))
-    (key-place 1 cornerrow web-post-br)
+    (key-place 1 cornerrow (web-post-bl-e 0 -2))
+    (thumb-tr-place thumb-post-tr)
+    (key-place 1 cornerrow (web-post-br-e 0 -2))
     (thumb-ttr-place thumb-post-tl)
-    ; this is because ttr thumb is so high/angled,
-    ; we need to manually tweak the triangles it a bit
-    (translate [0 -1 0] (key-place 2 cornerrow web-post-bl))
     (thumb-ttr-place thumb-post-tr)
-    (translate [0 -1 0] (key-place 2 cornerrow web-post-br))
-    (key-place 3 lastrow web-post-tl)
-    (key-place 3 cornerrow web-post-bl)
+    )
+   (triangle-hulls
+     (key-place 1 cornerrow (web-post-br-e 0 -2))
+     (key-place 2 cornerrow (web-post-bl-e 0 -2))
+     (thumb-ttr-place thumb-post-tr)
+     (key-place 2 cornerrow (web-post-br-e 0 -2))
+     (key-place 3 cornerrow (web-post-bl-e 0 -2))
+     )
+   (triangle-hulls
+     (thumb-ttr-place thumb-post-tr)
+     (key-place 3 cornerrow (web-post-bl-e 0 -2))
+     (key-place 3 lastrow web-post-tl)
+     )
+   (triangle-hulls
+     (thumb-ttr-place thumb-post-tr)
+     (key-place 3 lastrow web-post-tl)
+     (thumb-ttr-place thumb-post-br)
+     (key-place 3 lastrow web-post-bl)
+     )
+    ;; on right and top side of "extra key" on row 4
+   (triangle-hulls
+    (key-place 3 lastrow web-post-br)
+    (key-place 4 cornerrow web-post-bl)
+    (key-place 3 lastrow web-post-tr)
+    (key-place 4 cornerrow web-post-bl)
     (key-place 3 lastrow web-post-tr)
     (key-place 3 cornerrow web-post-br)
-    (key-place 4 cornerrow web-post-bl))
-   (triangle-hulls
-    (thumb-ttr-place thumb-post-br)
-    (key-place 3 lastrow web-post-bl)
-    (thumb-ttr-place thumb-post-tr)
+    (key-place 3 lastrow web-post-tr)
     (key-place 3 lastrow web-post-tl)
+    (key-place 3 cornerrow web-post-bl)
+    (key-place 3 cornerrow web-post-br)
     )
-   ; this section is between ttr thumb and bottom key in col 2
-   (triangle-hulls
-    (key-place 1 cornerrow web-post-br)
-    (key-place 2 cornerrow web-post-bl)
-    (translate [0 -1 0] (key-place 2 cornerrow web-post-bl))
-    (key-place 2 cornerrow web-post-br)
-    (translate [0 -1 0] (key-place 2 cornerrow web-post-br))
-    (key-place 3 cornerrow web-post-bl))
-   (triangle-hulls
-    (key-place 3 lastrow web-post-tr)
-    (key-place 3 lastrow web-post-br)
-    (key-place 3 lastrow web-post-tr)
-    (key-place 4 cornerrow web-post-bl))))
+    )
+  )
 
 ;;;;;;;;;;
 ;; OLED ;;
