@@ -156,7 +156,7 @@
 (def cap-1u-top 12)
 (def cap-2u (* cap-1u 2))
 (def bl2 (/ cap-1u 2))
-(def cap-pressed 0) ; percentage, 1 is fully pressed
+(def cap-pressed 1) ; percentage, 1 is fully pressed
 (def cap-travel 3) ; how much the key switches depress
 (def cap-pos (+ 2 (* (- 1 cap-pressed) cap-travel)))
 (def sa-cap
