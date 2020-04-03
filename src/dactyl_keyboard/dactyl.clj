@@ -842,12 +842,37 @@
   )
 
 ; Cutout for controller/trrs jack holder
-(def usb-holder-ref (key-position 0 0 (map - (wall-locate2  0  -1) [0 (/ mount-height 2) 0])))
+(def controller-ref (key-position 0 0 (map - (wall-locate2  0  -1) [0 (/ mount-height 2) 0])))
+(def controller-cutout-pos (map + [-21 19.3 0] [(first controller-ref) (second controller-ref) 2]))
+(def controller-cutout-cube   (cube 28.666 30 12.6))
+;(def controller-cutout  (->>
+                          ;controller-cutout-cube
+                          ;(translate  (map + controller-cutout-pos  [-1.5  (* -1 wall-thickness) 3]))
+                          ;(rotate oled-mount-rotation-z [0 0 1])
+                          ;))
 
-(def usb-holder-position (map + [-18 19.3 0] [(first usb-holder-ref) (second usb-holder-ref) 2]))
-(def usb-holder-cube   (cube 28.666 30 12.6))
-(def usb-holder-space  (translate  (map + usb-holder-position  [-1.5  (* -1 wall-thickness) 3]) usb-holder-cube))
-(def usb-holder-holder (translate usb-holder-position (cube 19 15 4)))
+(def controller-holder-stl-pos
+   (add-vec controller-cutout-pos [16.4 -23.9 -2.0]))
+
+(def controller-holder-stl
+  (->> (import "controller holder.stl")
+     ;(scale [0.97 0.97 1])
+     (rotate (deg2rad 90) [1 0 0])
+     (rotate oled-mount-rotation-z [0 0 1])
+     (translate controller-holder-stl-pos)
+     )
+  )
+
+(defn intersect-bottom-hull [a b]
+  ;(hull (intersection a b)
+  (->> (project (intersection a b))
+       (extrude-linear {:height 12.6 :twist 0 :convexity 0})
+       (translate [0 0 (/ 12.6 2)])
+       )
+        ;)
+  )
+
+(defn controller-cutout [shape] (intersect-bottom-hull controller-holder-stl shape))
 
 (defn screw-insert-shape [bottom-radius top-radius height]
   (union
@@ -870,7 +895,7 @@
 (defn screw-insert-all-shapes [bottom-radius top-radius height]
   (union 
          ; near usb/trss holes
-         (screw-insert 0 0         bottom-radius top-radius height [4 -1 0])
+         (screw-insert 0 0         bottom-radius top-radius height [3.8 -2 0])
          ; middle top
          (screw-insert 3 0         bottom-radius top-radius height [-9 0 0])
          ; top right
@@ -1048,7 +1073,6 @@
 (key-position 3 8 (map + (wall-locate1 0 (- 4.9 (* 2 nrows))) [0 (/ mount-height 2) 0]))
 
 )
-	; (translate [(+ (first usb-holder-position ) 2) (second usb-holder-position) (/ (+ (last usb-holder-size) usb-holder-thickness) 2)]))
 
 (def wrest-wall-cut
 (->> (for [xyz (range 1.00 10 3)];controls the scale last number needs to be lower for thinner walls
@@ -1086,7 +1110,11 @@
 	;(translate [25 -103 0]))
 )
 
-(def model-right (difference
+(defn cut-bottom [shape] (difference shape (translate [0 0 -20] (cube 350 350 40))))
+
+(def case-walls-with-screws (union case-walls screw-insert-outers))
+
+(def model-right (cut-bottom
                    (union
                      key-holes
                      pinky-connectors
@@ -1094,15 +1122,17 @@
                      connectors
                      thumb
                      thumb-connectors
-                     (difference (union case-walls
-                                        screw-insert-outers)
-                                 usb-holder-space
+                     (difference case-walls-with-screws
+                                 (controller-cutout case-walls-with-screws)
                                  (if (== wrist-rest-on 1) (->> rest-case-cuts	(translate [(+ (first thumborigin ) 33) (- (second thumborigin)  (- 56 nrows)) 0])))
-                                 screw-insert-holes))
-                   (translate [0 0 -20] (cube 350 350 40))))
+                                 screw-insert-holes))))
+
 
 (spit "things/right.scad"
-      (write-scad model-right))
+      (write-scad
+        (union model-right
+               (-% controller-holder-stl))
+        ))
 
 ;(spit "things/left.scad"
       ;(write-scad (mirror [-1 0 0] model-right)))
