@@ -8,24 +8,35 @@
 (defn deg2rad [degrees]
   (* (/ degrees 180) pi))
 
-(defn rcube [sx sy sz rr] (->>
-                            (hull (for [x [-1 1] y [-1 1] z [-1 1]]
-                                    (translate [(* x (- (/ sx 2) (/ rr 2)))
-                                                (* y (- (/ sy 2) (/ rr 2)))
-                                                (* z (- (/ sz 2) (/ rr 2)))
-                                                ]
-                                               (sphere (/ rr 2)))
-                                    ))
-                            (with-fn 20)
-                            ))
+(def is-preview true)
 
-(defn rcylinder [radius height] (->>
-                                     (hull
-                                       (translate [0 0 (- (/ height 2) (/ radius 2))] (sphere (/ radius 2)))
-                                       (translate [0 0 (+ (/ height -2) (/ radius 2))] (sphere (/ radius 2)))
-                                       )
-                                     (with-fn 20)
-                                     ))
+(defn rcube [sx sy sz rr] (if is-preview
+                            (cube sx sy sz)
+                            (->>
+                              (hull (for [x [-1 1] y [-1 1] z [-1 1]]
+                                      (translate [(* x (- (/ sx 2) (/ rr 2)))
+                                                  (* y (- (/ sy 2) (/ rr 2)))
+                                                  (* z (- (/ sz 2) (/ rr 2)))
+                                                  ]
+                                                 (sphere (/ rr 2)))
+                                      ))
+                              (with-fn 20)
+                              )
+                            )
+  )
+
+(defn rcylinder [radius height] 
+  (if is-preview
+    (cylinder radius height)
+    (->>
+      (hull
+        (translate [0 0 (- (/ height 2) (/ radius 2))] (sphere (/ radius 2)))
+        (translate [0 0 (+ (/ height -2) (/ radius 2))] (sphere (/ radius 2)))
+        )
+      (with-fn 20)
+      )
+    )
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Shape parameters ;;
