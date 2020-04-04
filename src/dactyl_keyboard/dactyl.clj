@@ -8,6 +8,25 @@
 (defn deg2rad [degrees]
   (* (/ degrees 180) pi))
 
+(defn rcube [sx sy sz rr] (->>
+                            (hull (for [x [-1 1] y [-1 1] z [-1 1]]
+                                    (translate [(* x (- (/ sx 2) (/ rr 2)))
+                                                (* y (- (/ sy 2) (/ rr 2)))
+                                                (* z (- (/ sz 2) (/ rr 2)))
+                                                ]
+                                               (sphere (/ rr 2)))
+                                    ))
+                            (with-fn 20)
+                            ))
+
+(defn rcylinder [radius height] (->>
+                                     (hull
+                                       (translate [0 0 (- (/ height 2) (/ radius 2))] (sphere (/ radius 2)))
+                                       (translate [0 0 (+ (/ height -2) (/ radius 2))] (sphere (/ radius 2)))
+                                       )
+                                     (with-fn 20)
+                                     ))
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Shape parameters ;;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -76,6 +95,8 @@
 (def cornerrow (dec lastrow))
 (def lastcol (dec ncols))
 
+(def rounding-radius 1)
+
 ;;;;;;;;;;;;;;;;;
 ;; Switch Hole ;;
 ;;;;;;;;;;;;;;;;;
@@ -99,39 +120,27 @@
 (def mount-height (+ keyswitch-height 3))
 
 (def single-plate
-  (let [top-wall (->> (cube (+ keyswitch-width 3) 1.5 plate-thickness)
-                      (translate [0
-                                  (+ (/ 1.5 2) (/ keyswitch-height 2))
-                                  (/ plate-thickness 2)]))
-        left-wall (->> (cube 1.5 (+ keyswitch-height 3) plate-thickness)
-                       (translate [(+ (/ 1.5 2) (/ keyswitch-width 2))
-                                   0
-                                   (/ plate-thickness 2)]))
-        side-nub (->> (binding [*fn* 30] (cylinder 1 2.75))
+  (let [
+        outer-cube (rcube mount-width mount-height plate-thickness rounding-radius)
+        inner-cut (cube keyswitch-width keyswitch-height (+ plate-thickness 0.01))
+        outer-frame (difference outer-cube inner-cut)
+        side-nub (->> (with-fn 30 (cylinder 1 2.75))
                       (rotate (/ π 2) [1 0 0])
                       (translate [(+ (/ keyswitch-width 2)) 0 1])
-                      (hull (->> (cube 1.5 2.75 side-nub-thickness)
-                                 (translate [(+ (/ 1.5 2) (/ keyswitch-width 2))
+                      (hull (->> (rcube 1.5 2.75 side-nub-thickness rounding-radius)
+                                 (translate [(- (/ mount-width 2) (/ 1.5 2))
                                              0
                                              (/ side-nub-thickness 2)])))
                       (translate [0 0 (- plate-thickness side-nub-thickness)]))
-        plate-half (union top-wall left-wall (if create-side-nubs? (with-fn 100 side-nub)))
-        ;top-nub (->> (cube 5 5 retention-tab-hole-thickness)
-                     ;(translate [(+ (/ keyswitch-width 2)) 0 (/ retention-tab-hole-thickness 2)]))
-        ;top-nub-pair (union top-nub
-                            ;(->> top-nub
-                                 ;(mirror [1 0 0])
-                                 ;(mirror [0 1 0])))
         ]
-    (difference
-     (union plate-half
-            (->> plate-half
-                 (mirror [1 0 0])
-                 (mirror [0 1 0])))
-     ;(->>
-      ;top-nub-pair
-      ;(rotate (/ π 2) [0 0 1]))
-     )))
+    (->> (union
+           (->> outer-frame (translate [0 0 (/ plate-thickness 2)]))
+           side-nub
+           (mirror [1 0 0] side-nub)
+           )
+         )
+    )
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;; OLED screen holder ;;
@@ -334,12 +343,18 @@
 ;;;;;;;;;;;;;;;;;;;;
 
 (def web-thickness 3)
-(def post-size 0.4)
-(def web-post (->> (cube post-size post-size web-thickness)
-                   (translate [0 0 (+ (/ web-thickness -2) plate-thickness)])
-                   ))
+(def post-size rounding-radius)
 
-(def oled-post (->> (cube post-size post-size oled-holder-thickness)
+;(defn web-post-shape [height] (cube post-size post-size height))
+;(defn web-post-shape [height] (with-fn 30 (cylinder (/ post-size 2) height)))
+(defn web-post-shape [height] (rcylinder post-size height))
+
+(def web-post (->>
+                (web-post-shape web-thickness)
+                (translate [0 0 (+ (/ web-thickness -2) plate-thickness)])
+                ))
+
+(def oled-post (->> (web-post-shape oled-holder-thickness)
                     (translate [0 0 (+ (/ oled-holder-thickness -2) plate-thickness)])
                     ))
 
