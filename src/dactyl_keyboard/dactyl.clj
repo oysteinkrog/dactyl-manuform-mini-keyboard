@@ -844,12 +844,6 @@
 ; Cutout for controller/trrs jack holder
 (def controller-ref (key-position 0 0 (map - (wall-locate2  0  -1) [0 (/ mount-height 2) 0])))
 (def controller-cutout-pos (map + [-21 19.3 0] [(first controller-ref) (second controller-ref) 2]))
-(def controller-cutout-cube   (cube 28.666 30 12.6))
-;(def controller-cutout  (->>
-                          ;controller-cutout-cube
-                          ;(translate  (map + controller-cutout-pos  [-1.5  (* -1 wall-thickness) 3]))
-                          ;(rotate oled-mount-rotation-z [0 0 1])
-                          ;))
 
 (def controller-holder-stl-pos
    (add-vec controller-cutout-pos [16.4 -23.9 -2.0]))
@@ -863,16 +857,14 @@
      )
   )
 
-(defn intersect-bottom-hull [a b]
-  ;(hull (intersection a b)
+(defn intersect-bottom [a b]
   (->> (project (intersection a b))
        (extrude-linear {:height 12.6 :twist 0 :convexity 0})
        (translate [0 0 (/ 12.6 2)])
        )
-        ;)
   )
 
-(defn controller-cutout [shape] (intersect-bottom-hull controller-holder-stl shape))
+(defn controller-cutout [shape] (intersect-bottom controller-holder-stl shape))
 
 (defn screw-insert-shape [bottom-radius top-radius height]
   (union
