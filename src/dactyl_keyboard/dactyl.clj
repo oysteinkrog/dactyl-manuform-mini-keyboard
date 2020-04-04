@@ -8,7 +8,7 @@
 (defn deg2rad [degrees]
   (* (/ degrees 180) pi))
 
-(def is-preview true)
+(def is-preview false)
 
 (defn rcube [sx sy sz rr] (if is-preview
                             (cube sx sy sz)
