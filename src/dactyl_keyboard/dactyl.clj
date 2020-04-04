@@ -340,11 +340,8 @@
                    ))
 
 (def oled-post (->> (cube post-size post-size oled-holder-thickness)
-                   (rotate oled-mount-rotation-x [1 0 0])
-                   (rotate oled-mount-rotation-z [0 0 1])
-                   (translate [0 0 oled-holder-thickness])
-                   )
-  )
+                    (translate [0 0 (+ (/ oled-holder-thickness -2) plate-thickness)])
+                    ))
 
 (def post-adj (/ post-size -2))
 (def web-post-tr (translate [(- (/ mount-width 2) post-adj) (- (/ mount-height 2) post-adj) 0] web-post))
@@ -659,9 +656,7 @@
         (translate (div-vec oled-mount-size [x y 1]) (cylinder (/ 2.5 2) 10)))
       )
     (rotate (deg2rad 180) [0 1 0])
-    (rotate oled-mount-rotation-z [0 0 1])
-    (rotate oled-mount-rotation-x [1 0 0])
-    (translate [0 0 oled-holder-thickness])
+    (translate [0 0 (/ oled-holder-thickness 2)])
     )
   )
 
@@ -706,16 +701,16 @@
       [(* mount-width -0.5) (* mount-width 0.5) 0]
       [(* oled-holder-width -0.5) (* oled-holder-height -0.5) 0]
       [(* xdir oled-holder-width 0.5) (* ydir oled-holder-height 0.5) 0]
-      [-3 6 -10]
+      [-3 6 -7]
       )
-    (rotate-around-z oled-mount-rotation-z)
-    (rotate-around-x oled-mount-rotation-x)
     )
   )
 
 (defn left-wall-plate-place [xdir ydir shape]
   (->> shape
        (translate (left-wall-plate-position xdir ydir))
+       (rotate oled-mount-rotation-x [1 0 0])
+       (rotate oled-mount-rotation-z [0 0 1])
        )
   )
 
@@ -760,8 +755,6 @@
     (wall-brace  (partial left-wall-plate-place -1 1) 0 1 oled-post  (partial left-wall-plate-place -1 1) -1 0 oled-post)
     (wall-brace  (partial left-wall-plate-place -1 1) -1 0 oled-post  (partial left-wall-plate-place -1 -1) -1 -1 oled-post)
     (left-wall-plate-place 0 0 oled-holder)
-    ;(-# (left-wall-plate-place 0 0 (cube 1 1 1)))
-    (for [x [-1 1] y [-1 1]] (-# (left-wall-plate-place x y oled-post)))
 
     (wall-brace  (partial left-wall-plate-place -1 -1) -1 -1 oled-post  thumb-tl-place -1 0 web-post-tl)
     (wall-brace  thumb-tl-place -1 0 web-post-tl thumb-tl-place -1 0 web-post-bl)
@@ -843,7 +836,7 @@
 
 ; Cutout for controller/trrs jack holder
 (def controller-ref (key-position 0 0 (map - (wall-locate2  0  -1) [0 (/ mount-height 2) 0])))
-(def controller-cutout-pos (map + [-21 19.3 0] [(first controller-ref) (second controller-ref) 2]))
+(def controller-cutout-pos (map + [-21 19.8 0] [(first controller-ref) (second controller-ref) 2]))
 
 (def controller-holder-stl-pos
    (add-vec controller-cutout-pos [16.4 -23.9 -2.0]))
@@ -886,8 +879,8 @@
 
 (defn screw-insert-all-shapes [bottom-radius top-radius height]
   (union 
-         ; near usb/trss holes
-         (screw-insert 0 0         bottom-radius top-radius height [3.8 -2 0])
+         ; top left, near usb/trrs
+         (screw-insert 0 0         bottom-radius top-radius height [5.8 -3 0])
          ; middle top
          (screw-insert 3 0         bottom-radius top-radius height [-9 0 0])
          ; top right
