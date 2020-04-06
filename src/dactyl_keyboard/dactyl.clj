@@ -120,33 +120,52 @@
 ; If you use other switches such as Kailh, you should set this as false
 
 ; kailh/aliaz: no nubs, 13.9
-; outemu: nubs, 14.05x14.1
+; outemu: nubs, 14.00x14.0
 (def create-side-nubs? true)
-(def keyswitch-height 14.2) ;; Was 14.1, then 14.25, then 13.9 (for snug fit with with aliaz/outemy sky switches)
-(def keyswitch-width 14.15)
+(def keyswitch-height 13.95) ;; Was 14.1, then 14.25, then 13.9 (for snug fit with with aliaz/outemy sky switches)
+(def keyswitch-width 13.95)
 
 (def sa-profile-key-height 7.39)
 
 (def plate-thickness 3)
-(def side-nub-thickness 4)
-(def retention-tab-thickness 1.5)
-(def retention-tab-hole-thickness (- plate-thickness retention-tab-thickness))
-(def mount-width (+ keyswitch-width 3))
-(def mount-height (+ keyswitch-height 3))
+(def mount-padding 1.5)
+(def side-nub-thickness 3.25)
+(def side-nub-size [(+ mount-padding 1.25) 3 side-nub-thickness])
+(def mount-width (+ keyswitch-width (* mount-padding 2)))
+(def mount-height (+ keyswitch-height (* mount-padding 2)))
 
 (def single-plate
   (let [
         outer-cube (rcube mount-width mount-height plate-thickness rounding-radius)
         inner-cut (cube keyswitch-width keyswitch-height (+ plate-thickness 0.01))
-        outer-frame (difference outer-cube inner-cut)
-        side-nub (->> (with-fn 30 (cylinder 1 2.75))
-                      (rotate (/ π 2) [1 0 0])
-                      (translate [(+ (/ keyswitch-width 2)) 0 1])
-                      (hull (->> (rcube 1.5 2.75 side-nub-thickness rounding-radius)
-                                 (translate [(- (/ mount-width 2) (/ 1.5 2))
-                                             0
-                                             (/ side-nub-thickness 2)])))
-                      (translate [0 0 (- plate-thickness side-nub-thickness)]))
+        clip-cut (for [x [-1 1]] (->> (cube 5 1 plate-thickness)
+                               (ty (* x (/ keyswitch-height 2)))
+                               (tz (- 1))
+                               ))
+        outer-frame (difference outer-cube inner-cut clip-cut)
+        side-nub (->> (union
+                        (hull
+                          (->> (rcube mount-padding (second side-nub-size) (nth side-nub-size 2) rounding-radius)
+                               (tx (- (/ mount-width 2) (/ mount-padding 2)))
+                               (tz (/ (nth side-nub-size 2) 2))
+                               )
+                          (->> (rcube (first side-nub-size) (second side-nub-size) (- (nth side-nub-size 2) 1) rounding-radius)
+                               (tx (- (/ mount-width 2) (/ (nth side-nub-size 0) 2)))
+                               (tz (/ (+ 1 (nth side-nub-size 2)) 2))
+                               (tz -1))
+                          )
+                        (hull
+                          (->> (rcube mount-padding (+ 4 (second side-nub-size)) (- (nth side-nub-size 2) 2) rounding-radius)
+                               (tx (- (/ mount-width 2) (/ mount-padding 2)))
+                               (tz (/ (nth side-nub-size 2) 2))
+                               )
+                          (->> (rcube mount-padding (second side-nub-size) (nth side-nub-size 2) rounding-radius)
+                               (tx (- (/ mount-width 2) (/ mount-padding 2)))
+                               (tz (/ (nth side-nub-size 2) 2))
+                               )
+                          )
+                        )
+                      (tz (- plate-thickness side-nub-thickness)))
         ]
     (->> (union
            (->> outer-frame (translate [0 0 (/ plate-thickness 2)]))
@@ -357,7 +376,7 @@
 ;; Web Connectors ;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(def web-thickness 3)
+(def web-thickness plate-thickness)
 (def post-size rounding-radius)
 
 ;(defn web-post-shape [height] (cube post-size post-size height))
