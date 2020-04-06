@@ -38,6 +38,10 @@
     )
   )
 
+(defn tx [dx shape] (translate [dx 0 0] shape))
+(defn ty [dy shape] (translate [0 dy 0] shape))
+(defn tz [dz shape] (translate [0 0 dz] shape))
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Shape parameters ;;
 ;;;;;;;;;;;;;;;;;;;;;;
