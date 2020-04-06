@@ -122,8 +122,8 @@
 ; kailh/aliaz: no nubs, 13.9
 ; outemu: nubs, 14.00x14.0
 (def create-side-nubs? true)
-(def keyswitch-height 13.95) ;; Was 14.1, then 14.25, then 13.9 (for snug fit with with aliaz/outemy sky switches)
-(def keyswitch-width 13.95)
+(def keyswitch-height 14.00) ;; Was 14.1, then 14.25, then 13.9 (for snug fit with with aliaz/outemy sky switches)
+(def keyswitch-width 14.00)
 
 (def sa-profile-key-height 7.39)
 
