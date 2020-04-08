@@ -112,6 +112,7 @@
 (def lastcol (dec ncols))
 
 (def rounding-radius 1)
+;(def rounding-radius 0)
 
 ;;;;;;;;;;;;;;;;;
 ;; Switch Hole ;;
@@ -390,11 +391,14 @@
 ;;;;;;;;;;;;;;;;;;;;
 
 (def web-thickness plate-thickness)
-(def post-size rounding-radius)
+(def post-size (if (= rounding-radius 0) 1 rounding-radius))
 
 ;(defn web-post-shape [height] (cube post-size post-size height))
 ;(defn web-post-shape [height] (with-fn 30 (cylinder (/ post-size 2) height)))
-(defn web-post-shape [height] (rcylinder post-size height))
+(defn web-post-shape [height]
+  (if (= rounding-radius 0)
+    (cube post-size post-size height)
+    (rcylinder post-size height)))
 
 (def web-post (->>
                 (web-post-shape web-thickness)
