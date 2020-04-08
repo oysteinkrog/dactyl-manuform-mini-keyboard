@@ -1175,6 +1175,26 @@
                      screw-insert-holes)))
 
 
+(defn flat-plate [nx ny thickness]
+  (let [
+        between-keys-dx 20
+        between-keys-dy 20
+        sx (+ 3 (* nx between-keys-dx))
+        sy (+ 3 (* ny between-keys-dy))
+        sz (+ thickness 6)
+        ]
+    (union
+      (difference
+        (translate [(/ (- sx between-keys-dx) 2) (/ (- sy between-keys-dy) 2) (/ sz -2)] 
+                   (rcube sx sy sz rounding-radius))
+        (for [x (range 0 3) y (range 0 3)]
+          (translate [(* x between-keys-dx) (* y between-keys-dy)] (single-plate-cut (+ 1 sz))))
+        )
+      (for [x (range 0 3) y (range 0 3)]
+        (translate [(* x between-keys-dx) (* y between-keys-dy)] single-plate-side-nubs))
+      )
+    )
+  )
 
 (spit "things/right.scad"
       (write-scad
