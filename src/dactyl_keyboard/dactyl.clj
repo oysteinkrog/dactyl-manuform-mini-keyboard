@@ -9,8 +9,7 @@
   (* (/ degrees 180) pi))
 
 (def is-preview false)
-
-(defn rcube [sx sy sz rr] (if is-preview
+(defn rcube [sx sy sz rr] (if (or is-preview (= rr 0))
                             (cube sx sy sz)
                             (->>
                               (hull (for [x [-1 1] y [-1 1] z [-1 1]]
