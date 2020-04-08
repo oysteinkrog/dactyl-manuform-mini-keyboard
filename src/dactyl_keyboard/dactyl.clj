@@ -45,6 +45,8 @@
 ;; Shape parameters ;;
 ;;;;;;;;;;;;;;;;;;;;;;
 
+(def round-case true)
+
 (def nrows 4)
 (def ncols 6)
 
@@ -128,51 +130,56 @@
 
 (def plate-thickness 3)
 (def mount-padding 1.5)
-(def side-nub-thickness 3.25)
-(def side-nub-size [(+ mount-padding 1.25) 3 side-nub-thickness])
+(def side-nub-thickness 3.0)
+(def side-nub-size [(+ mount-padding 1.0) 3 side-nub-thickness])
 (def mount-width (+ keyswitch-width (* mount-padding 2)))
 (def mount-height (+ keyswitch-height (* mount-padding 2)))
 
+(defn single-plate-outer-cube [thickness] (tz (/ thickness -2) (rcube mount-width mount-height thickness rounding-radius)))
+(defn single-plate-inner-cut [thickness] (->> (cube keyswitch-width keyswitch-height thickness)
+                                              (tz (/ thickness -2) )
+                                              (tz 0.1)
+                                              ))
+(defn single-plate-clip-cut [thickness] (for [y [-1 1]] (->> (cube 5 1 thickness)
+                                                (ty (* y (/ keyswitch-height 2)))
+                                                (tz -1)
+                                                (tz (/ thickness -2))
+                                                )))
+(defn single-plate-cut [thickness] (union (single-plate-inner-cut thickness) (single-plate-clip-cut thickness)))
+
+(def single-plate-side-nub (->> (union
+                                  (hull
+                                    (->> (rcube mount-padding (second side-nub-size) (nth side-nub-size 2) 1)
+                                         (tx (- (/ mount-width 2) (/ mount-padding 2)))
+                                         )
+                                    (->> (rcube (first side-nub-size) (second side-nub-size) (- (nth side-nub-size 2) 2) 1)
+                                         (tx (- (/ mount-width 2) (/ (nth side-nub-size 0) 2)))
+                                         (tz (/ 1 2))
+                                         (tz -2))
+                                    )
+                                  (hull
+                                    (->> (rcube mount-padding (+ 2 (second side-nub-size)) (- (nth side-nub-size 2) 2) 1)
+                                         (tx (- (/ mount-width 2) (/ mount-padding 2)))
+                                         (tz (/ (- 3) 2))
+                                         )
+                                    (->> (rcube mount-padding (second side-nub-size) (nth side-nub-size 2) 1)
+                                         (tx (- (/ mount-width 2) (/ mount-padding 2)))
+                                         )
+                                    )
+                                  )
+                                (tz (/ side-nub-thickness -2))
+                                )
+  )
+
+(def single-plate-side-nubs (union single-plate-side-nub (mirror [1 0 0] single-plate-side-nub)))
+
 (def single-plate
-  (let [
-        outer-cube (rcube mount-width mount-height plate-thickness rounding-radius)
-        inner-cut (cube keyswitch-width keyswitch-height (+ plate-thickness 0.01))
-        clip-cut (for [x [-1 1]] (->> (cube 5 1 plate-thickness)
-                               (ty (* x (/ keyswitch-height 2)))
-                               (tz (- 1))
-                               ))
-        outer-frame (difference outer-cube inner-cut clip-cut)
-        side-nub (->> (union
-                        (hull
-                          (->> (rcube mount-padding (second side-nub-size) (nth side-nub-size 2) rounding-radius)
-                               (tx (- (/ mount-width 2) (/ mount-padding 2)))
-                               (tz (/ (nth side-nub-size 2) 2))
-                               )
-                          (->> (rcube (first side-nub-size) (second side-nub-size) (- (nth side-nub-size 2) 1) rounding-radius)
-                               (tx (- (/ mount-width 2) (/ (nth side-nub-size 0) 2)))
-                               (tz (/ (+ 1 (nth side-nub-size 2)) 2))
-                               (tz -1))
-                          )
-                        (hull
-                          (->> (rcube mount-padding (+ 4 (second side-nub-size)) (- (nth side-nub-size 2) 2) rounding-radius)
-                               (tx (- (/ mount-width 2) (/ mount-padding 2)))
-                               (tz (/ (nth side-nub-size 2) 2))
-                               )
-                          (->> (rcube mount-padding (second side-nub-size) (nth side-nub-size 2) rounding-radius)
-                               (tx (- (/ mount-width 2) (/ mount-padding 2)))
-                               (tz (/ (nth side-nub-size 2) 2))
-                               )
-                          )
-                        )
-                      (tz (- plate-thickness side-nub-thickness)))
-        ]
-    (->> (union
-           (->> outer-frame (translate [0 0 (/ plate-thickness 2)]))
-           side-nub
-           (mirror [1 0 0] side-nub)
-           )
-         )
-    )
+  (->> (union
+         (difference
+           (single-plate-outer-cube plate-thickness)
+           (single-plate-cut (+ 1 plate-thickness)))
+         single-plate-side-nubs)
+       )
   )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -353,14 +360,21 @@
 (defn key-position [column row position]
   (apply-key-geometry (partial map +) rotate-around-x rotate-around-y column row position))
 
+(defn key-hole [column row]
+  (->> (union
+         (difference (single-plate-outer-cube plate-thickness)
+                     (single-plate-cut (+ 1 plate-thickness)))
+         single-plate-side-nubs
+         )
+                   
+       (tz plate-thickness)
+       (key-place column row)
+       ))
+
 (def key-holes
   (apply union
-         (for [column columns
-               row rows
-               :when (or (.contains [3] column)
-                         (not= row lastrow))]
-           (->> single-plate
-                (key-place column row)))))
+         (for [column columns row rows :when (or (.contains [3] column) (not= row lastrow))]
+           (key-hole column row))))
 
 (def caps
   (apply union
@@ -521,24 +535,18 @@
    (thumb-tl-place shape)
    ))
 
-(def larger-plate
-  (let [plate-height (- (/ (- cap-2u mount-height) 3) 0.5)
-        top-plate (->> (cube mount-width plate-height web-thickness)
-                       (translate [0 (/ (+ plate-height mount-height) 2)
-                                   (- plate-thickness (/ web-thickness 2))]))]
-    (union top-plate (mirror [0 1 0] top-plate))))
-
 (def thumbcaps
   (union
    (thumb-1x-layout (sa-cap 1))
    (thumb-15x-layout (rotate (/ π 2) [0 0 1] (sa-cap 1.25)))))
 
 (def thumb
-  (union
-   (thumb-1x-layout single-plate)
-   (thumb-15x-layout single-plate)
-  ; (thumb-15x-layout larger-plate)
-))
+  (->>
+    (union
+      (thumb-1x-layout (tz plate-thickness single-plate))
+      (thumb-15x-layout (tz plate-thickness single-plate))
+      )
+    ))
 
 (def thumb-post-tr (translate [(- (/ mount-width 2) post-adj)  (- (/ mount-height  2) post-adj) 0] web-post))
 (def thumb-post-tl (translate [(+ (/ mount-width -2) post-adj) (- (/ mount-height  2) post-adj) 0] web-post))
@@ -1148,17 +1156,20 @@
 (def case-walls-with-screws (union case-walls screw-insert-outers))
 
 (def model-right (cut-bottom
-                   (union
-                     key-holes
-                     pinky-connectors
-                     pinky-walls
-                     connectors
-                     thumb
-                     thumb-connectors
-                     (difference case-walls-with-screws
-                                 (controller-cutout case-walls-with-screws)
-                                 (if (== wrist-rest-on 1) (->> rest-case-cuts	(translate [(+ (first thumborigin ) 33) (- (second thumborigin)  (- 56 nrows)) 0])))
-                                 screw-insert-holes))))
+                   (difference
+                     (union
+                       key-holes
+                       pinky-connectors
+                       pinky-walls
+                       connectors
+                       thumb
+                       thumb-connectors
+                       (difference case-walls-with-screws
+                                   (controller-cutout case-walls-with-screws)
+                                   ))
+                     (if (== wrist-rest-on 1) (->> rest-case-cuts	(translate [(+ (first thumborigin ) 33) (- (second thumborigin)  (- 56 nrows)) 0])))
+                     screw-insert-holes)))
+
 
 
 (spit "things/right.scad"
