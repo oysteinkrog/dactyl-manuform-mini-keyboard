@@ -103,6 +103,7 @@
 (def wrist-rest-rotation-angle 100)			;;0 default The angle in counter clockwise the wrist rest is at
 (def wrist-rest-ledge 3.5)					;;The height of ledge the silicone wrist rest fits inside
 (def wrist-rest-y-angle 0)					;;0 Default.  Controls the wrist rest y axis tilt (left to right)
+(def wrist-rest-rounding 3)
 
 
 ;;Wrist rest to case connections
@@ -740,6 +741,8 @@
 (defn bottom-hull [& p]
   (hull p (bottom 0.001 p)))
 
+(defn cut-bottom [shape] (difference shape (translate [0 0 -20] (cube 1000 1000 40))))
+
 (def left-wall-x-offset 0) ; original 10
 (def left-wall-z-offset 0) ; original 3
 
@@ -1012,158 +1015,143 @@
               ;(->> (cube 18 10 15)(translate [0 -14.4 0]))
               ))
 
-(def cut-bottom
-  (->>(cube 300 300 100)(translate [0 0 -50]))
-  )
 
 (def h-offset
-  (* (Math/tan(/ (* π wrist-rest-angle) 180)) 88)
+  (* (Math/tan(deg2rad wrist-rest-angle)) 88)
   )
 
 (def scale-cos
-  (Math/cos(/ (* π wrist-rest-angle) 180))
+  (Math/cos(deg2rad wrist-rest-angle))
   )
 
 (def scale-amount
   (/ (* 83.7 scale-cos) 19.33)
   )
 
-(def wrist-rest
-  (difference
-    (scale [4.25  scale-amount  1] (difference (union
-                                                 (difference
-                                                   ;the main back circle
-                                                   (scale[1.3, 1, 1](->> (cylinder 10 150)(with-fn 200)
-                                                                         (translate [0 0 0])))
-                                                   ;front cut cube and circle
-                                                   (scale[1.1, 1, 1](->> (cylinder 7 201)(with-fn 200)
-                                                                         (translate [0 -13.4 0]))
-                                                               (->> (cube 18 10 201)(translate [0 -12.4 0]))
-
-                                                               ))
-                                                 ;;side fillers
-                                                 (->> (cylinder 6.8 200)(with-fn 200)
-                                                      (translate [-6.15 -0.98 0]))
-
-                                                 (->> (cylinder 6.8 200)(with-fn 200)
-                                                      (translate [6.15 -0.98 0]))
-                                                 ;;heart shapes at bottom
-                                                 (->> (cylinder 5.9 200)(with-fn 200)
-                                                      (translate [-6.35 -2 0]))
-
-
-                                                 (scale[1.01, 1, 1](->> (cylinder 5.9 200)(with-fn 200)
-                                                                        (translate [6.35 -2. 0])))
-                                                 )
-
-                                               )
-           )
-
-    cut-bottom
-
-    )
-  )
-
-
-;(def right_wrist_connecter_x 25)
-(def wrist-rest-base
+(defn wrist-rest [height]
   (->>
-    (scale [1 1 1] ;;;;scale the wrist rest to the final size after it has been cut
-           (difference
-             (scale [1.08 1.08 1] wrist-rest )
-             (->> (cube 200 200 200)(translate [0 0 (+ (+ (/ h-offset 2) (- wrist-rest-back-height h-offset) ) 100)]) (rotate  (/ (* π wrist-rest-angle) 180)  [1 0 0])(rotate  (/ (* π wrist-rest-y-angle) 180)  [0 1 0]))
-             ;	(->> (cube 200 200 200)(translate [0 0 (+ (+ (- wrist-rest-back-height h-offset) (* 2 h-offset)) 100)]) (rotate  (/ (* π wrist-rest-angle) 180)  [1 0 0]))
-             ;	(->> (cube 200 200 200)(translate [0 0 (+ (+ (/ (* 88 (Math/tan(/ (* π wrist-rest-angle) 180))) 4) 100) wrist-rest-back-height)]) (rotate  (/ (* π wrist-rest-angle) 180)  [1 0 0]))
-             (->> (difference
-                    wrist-rest
-                    (->> (cube 200 200 200)(translate [0 0 (- (+ (/ h-offset 2) (- wrist-rest-back-height h-offset) ) (+ 100  wrist-rest-ledge))]) (rotate  (/ (* π wrist-rest-angle) 180)  [1 0 0])(rotate  (/ (* π wrist-rest-y-angle) 180)  [0 1 0]))
-                    ;(->> (cube 200 200 200)(translate [0 0 (- (+ (/ (* 17.7 (Math/tan(/ (* π wrist-rest-angle) 180))) 4) wrist-rest-back-height)(+ 100  wrist-rest-ledge))])(rotate  (/ (* π wrist-rest-angle) 180)  [1 0 0])))
-                    )
-                  )
-             (translate [40 -28 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
-             (translate [-40 -28 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
-             (translate [50 10 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
-             (translate [-50 10 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
-             (translate [-50 10 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
-             (translate [0 40 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
-             );(rotate  (/ (* π wrist-rest-rotation-angle) 180)  [0 0 1])
-           )
+    (union
+      (difference
+        ;the main back circle
+        (scale[1.3, 1, 1](->> (cylinder 10 height)(with-fn 200)))
+
+        ;front cut cube and circle
+        (scale[1.1, 1, 1](->> (cylinder 7 (+ height 1))(with-fn 200)
+                              (translate [0 -13.4 0]))
+                    (->> (cube 18 10 (+ height 1))(translate [0 -12.4 0]))))
+      ;;side fillers
+      (->> (cylinder 6.8 height)(with-fn 200)
+           (translate [-6.15 -0.98 0]))
+
+      (->> (cylinder 6.8 height)(with-fn 200)
+           (translate [6.15 -0.98 0]))
+
+      ;;heart shapes at bottom
+      (->> (cylinder 5.9 height)(with-fn 200)
+           (translate [-6.35 -2 0]))
+
+
+      (scale[1.01, 1, 1] (->> (cylinder 5.9 height)(with-fn 200)
+                              (translate [6.35 -2. 0])))
+      )
+    (scale [4.25 scale-amount 1])
+    cut-bottom
     )
   )
 
+
+(def wrist-rest-base
+  (difference
+
+    ; use minkowski to create outer rounding
+    (->> (minkowski
+           (wrist-rest (- wrist-rest-back-height wrist-rest-rounding))
+           (with-fn 30 (sphere wrist-rest-rounding)))
+         (tz (/ wrist-rest-back-height 2))
+         (rdx wrist-rest-angle)
+         (rdy wrist-rest-y-angle)
+         (bottom-hull)
+         )
+
+    ; subtract inner cut, which fits the wrist rest gel pad
+    (->>
+      (wrist-rest 1000)
+      (tz (/ wrist-rest-back-height 2))
+      (tz 9)
+      (tz (- wrist-rest-ledge))
+      (rdx wrist-rest-angle)
+      (rdy wrist-rest-y-angle)
+      )
+
+    ; screws for silicon feet
+    (translate [40 -28 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+    (translate [-40 -28 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+    (translate [50 10 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+    (translate [-50 10 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+    (translate [-50 10 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+    (translate [0 40 0] (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+
+    )
+  )
 
 
 (def rest-case-cuts
-	(union
-	;;right cut
-			(->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x 24 4.5]))
-			(->> (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x (+ 33.8 nrows) 4.5]))
-			(->> (cube 6 3 12.2)(translate [right_wrist_connecter_x (+ 21 nrows) 1.5]));;39
-	;;middle cut
-			(->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x 14 4.5]))
-			(->> (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x 20 4.5]))
-			(->> (cube 6 3 12.2)(translate [middle_wrist_connecter_x (+ 17 nrows) 1.5]))
-	;;left
-			(->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x 11 4.5]))
-			(->> (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x (+ 17.25 nrows) 4.5]))
-			(->> (cube 6 3 12.2)(translate [left_wrist_connecter_x (+ 20.0 nrows) 1.5]))
-	)
-)
+  (union
+    ;;right cut
+    (->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x 24 4.5]))
+    (->> (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x (+ 33.8 nrows) 4.5]))
+    (->> (cube 6 3 12.2)(translate [right_wrist_connecter_x (+ 21 nrows) 1.5]));;39
+    ;;middle cut
+    (->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x 14 4.5]))
+    (->> (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x 20 4.5]))
+    (->> (cube 6 3 12.2)(translate [middle_wrist_connecter_x (+ 17 nrows) 1.5]))
+    ;;left
+    (->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x 11 4.5]))
+    (->> (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x (+ 17.25 nrows) 4.5]))
+    (->> (cube 6 3 12.2)(translate [left_wrist_connecter_x (+ 20.0 nrows) 1.5]))
+    )
+  )
 
 (def rest-case-connectors
-  (translate [0 10 0]
-	(difference
-		(union
-			(scale [1 1 1.6] (->> (cylinder 6 50)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x 5 0])));;right
-			(scale [1 1 1.6] (->> (cylinder 6 50)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x -2 0])))
-			(scale [1 1 1.6] (->> (cylinder 6 60)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x -6 0])))
-	;rest-case-cuts
-		)
-	))
-)
+  (ty 10
+      (difference
+        (union
+          (scale [1 1 1.6] (->> (cylinder 6 50)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x 5 0])));;right
+          (scale [1 1 1.6] (->> (cylinder 6 50)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x -2 0])))
+          (scale [1 1 1.6] (->> (cylinder 6 60)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x -6 0])))
+          )
+        ))
+  )
 
 (def wrist-rest-locate
-(key-position 3 8 (map + (wall-locate1 0 (- 4.9 (* 2 nrows))) [0 (/ mount-height 2) 0]))
+  (key-position 3 8 (map + (wall-locate1 0 (- 4.9 (* 2 nrows))) [0 (/ mount-height 2) 0])))
 
-)
-
-(def wrest-wall-cut
-(->> (for [xyz (range 1.00 10 3)];controls the scale last number needs to be lower for thinner walls
-						 (union
-							(translate[1, xyz,1] case-walls)
-						  ;(translate [0 0 -3])
-						)
-					)
-			))
-
+(def wrist-rest-case-wall-cut
+  ;controls the scale last number needs to be lower for thinner walls
+  (->> (for [xyz (range 1.00 10 3)]
+         (union (translate[1,xyz,1] case-walls))
+         )))
 
 (def wrist-rest-build
-	(difference
-		(->> (union
-          
-			(->> (translate wrist_brse_position (rotate  (/ (* π wrist-rest-rotation-angle) 180) [0 0 1] wrist-rest-base) ))
-					(->> (difference
-				;wrist-rest-sides
-
-							rest-case-connectors
-							rest-case-cuts
-							cut-bottom
-					;	wrest-wall-cut
-							)
-
-					)
-			)
-			 (translate [(+ (first thumborigin ) 33) (- (second thumborigin) 50) 0])
-		)
-	 (translate [(+ (first thumborigin ) 33) (- (second thumborigin) 50) 0] rest-case-cuts)
-	wrest-wall-cut
-	)
-
-
-	;(translate [25 -103 0]))
+  (difference
+    (->> (union
+           (->> wrist-rest-base
+                (rdz wrist-rest-rotation-angle)
+                (translate wrist_brse_position)
+                )
+           (->> (difference
+                  rest-case-connectors
+                  rest-case-cuts
+                  )
+                )
+           )
+         cut-bottom
+         (translate [(+ (first thumborigin ) 33) (- (second thumborigin) 50) 0])
+         )
+    (translate [(+ (first thumborigin ) 33) (- (second thumborigin) 50) 0] rest-case-cuts)
+    wrist-rest-case-wall-cut
+    )
 )
-
-(defn cut-bottom [shape] (difference shape (translate [0 0 -20] (cube 350 350 40))))
 
 (def case-walls-with-screws (union case-walls screw-insert-outers))
 
