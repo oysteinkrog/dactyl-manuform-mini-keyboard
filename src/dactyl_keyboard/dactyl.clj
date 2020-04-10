@@ -930,6 +930,15 @@
 
 (defn controller-cutout [shape] (intersect-bottom controller-holder-stl shape))
 
+(def encoder-pos (add-vec (left-wall-plate-position 0 -1) [0 -11 0]))
+(def encoder-rot-x oled-mount-rotation-x)
+(def encoder-rot-z oled-mount-rotation-z)
+(def encoder-cutout-shape (cylinder (/ 6.5 2) 1000))
+(def encoder-cutout (->> encoder-cutout-shape
+                         (rx encoder-rot-x)
+                         (rz encoder-rot-z)
+                         (translate encoder-pos)))
+
 (defn screw-insert-shape [bottom-radius top-radius height]
   (union
    (->> (binding [*fn* 30]
@@ -1168,7 +1177,9 @@
                                    (controller-cutout case-walls-with-screws)
                                    ))
                      (if (== wrist-rest-on 1) (->> rest-case-cuts	(translate [(+ (first thumborigin ) 33) (- (second thumborigin)  (- 56 nrows)) 0])))
-                     screw-insert-holes)))
+                     screw-insert-holes
+                     encoder-cutout
+                     )))
 
 
 (defn flat-plate [nx ny thickness]
