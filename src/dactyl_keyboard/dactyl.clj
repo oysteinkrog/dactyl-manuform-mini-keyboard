@@ -446,35 +446,61 @@
          (map (partial apply hull)
               (partition 3 1 shapes))))
 
-(def connectors
+(def pinky-connectors
   (apply union
          (concat
           ;; Row connections
-          (for [column (range 0 (dec ncols))
-                row (range 0 lastrow)]
+          (for [row (range 0 lastrow)]
             (triangle-hulls
-             (key-place (inc column) row web-post-tl)
-             (key-place column row web-post-tr)
-             (key-place (inc column) row web-post-bl)
-             (key-place column row web-post-br)))
+             (key-place lastcol row web-post-tr)
+             (key-place lastcol row wide-post-tr)
+             (key-place lastcol row web-post-br)
+             (key-place lastcol row wide-post-br)))
 
           ;; Column connections
-          (for [column columns
-                row (range 0 cornerrow)]
+          (for [row (range 0 cornerrow)]
             (triangle-hulls
-             (key-place column row web-post-bl)
-             (key-place column row web-post-br)
-             (key-place column (inc row) web-post-tl)
-             (key-place column (inc row) web-post-tr)))
+             (key-place lastcol row web-post-br)
+             (key-place lastcol row wide-post-br)
+             (key-place lastcol (inc row) web-post-tr)
+             (key-place lastcol (inc row) wide-post-tr)))
+          ;;
+)))
 
-          ;; Diagonal connections
-          (for [column (range 0 (dec ncols))
-                row (range 0 cornerrow)]
-            (triangle-hulls
-             (key-place column row web-post-br)
-             (key-place column (inc row) web-post-tr)
-             (key-place (inc column) row web-post-bl)
-             (key-place (inc column) (inc row) web-post-tl))))))
+(def connectors
+  (union
+    (apply union
+           (concat
+             ;; Row connections
+             (for [column (range 0 (dec ncols))
+                   row (range 0 lastrow)]
+               (triangle-hulls
+                 (key-place (inc column) row web-post-tl)
+                 (key-place column row web-post-tr)
+                 (key-place (inc column) row web-post-bl)
+                 (key-place column row web-post-br)))
+
+             ;; Column connections
+             (for [column columns
+                   row (range 0 cornerrow)]
+               (triangle-hulls
+                 (key-place column row web-post-bl)
+                 (key-place column row web-post-br)
+                 (key-place column (inc row) web-post-tl)
+                 (key-place column (inc row) web-post-tr)))
+
+             ;; Diagonal connections
+             (for [column (range 0 (dec ncols))
+                   row (range 0 cornerrow)]
+               (triangle-hulls
+                 (key-place column row web-post-br)
+                 (key-place column (inc row) web-post-tr)
+                 (key-place (inc column) row web-post-bl)
+                 (key-place (inc column) (inc row) web-post-tl)))
+             ))
+    pinky-connectors
+    )
+  )
 
 ;;;;;;;;;;;;
 ;; Thumbs ;;
@@ -875,9 +901,15 @@
     )
   )
 
+(def pinky-walls
+  (union
+   (key-wall-brace lastcol cornerrow 0 -1 web-post-br lastcol cornerrow 0 -1 wide-post-br)
+   (key-wall-brace lastcol 0 0 1 web-post-tr lastcol 0 0 1 wide-post-tr)))
+
 (def case-walls
   (union
    right-wall
+   pinky-walls
    ; back wall
    (for [x (range 0 ncols)] (key-wall-brace x 0 0 1 web-post-tl x       0 0 1 web-post-tr))
    (for [x (range 1 ncols)] (key-wall-brace x 0 0 1 web-post-tl (dec x) 0 0 1 web-post-tr))
@@ -986,32 +1018,6 @@
 ; Wall Thickness W:\t1.65
 (def screw-insert-outers (screw-insert-all-shapes (+ screw-insert-bottom-radius 1.65) (+ screw-insert-top-radius 1.65) (+ screw-insert-height 1.5)))
 (def screw-insert-screw-holes  (screw-insert-all-shapes 1.5 1.5 350))
-
-(def pinky-connectors
-  (apply union
-         (concat
-          ;; Row connections
-          (for [row (range 0 lastrow)]
-            (triangle-hulls
-             (key-place lastcol row web-post-tr)
-             (key-place lastcol row wide-post-tr)
-             (key-place lastcol row web-post-br)
-             (key-place lastcol row wide-post-br)))
-
-          ;; Column connections
-          (for [row (range 0 cornerrow)]
-            (triangle-hulls
-             (key-place lastcol row web-post-br)
-             (key-place lastcol row wide-post-br)
-             (key-place lastcol (inc row) web-post-tr)
-             (key-place lastcol (inc row) wide-post-tr)))
-          ;;
-)))
-
-(def pinky-walls
-  (union
-   (key-wall-brace lastcol cornerrow 0 -1 web-post-br lastcol cornerrow 0 -1 wide-post-br)
-   (key-wall-brace lastcol 0 0 1 web-post-tr lastcol 0 0 1 wide-post-tr)))
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;;;;Wrist rest;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1168,8 +1174,6 @@
                    (difference
                      (union
                        key-holes
-                       pinky-connectors
-                       pinky-walls
                        connectors
                        thumb
                        thumb-connectors
