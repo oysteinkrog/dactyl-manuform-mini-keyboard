@@ -49,6 +49,21 @@
 (defn rdy [degrees shape] (ry (deg2rad degrees) shape))
 (defn rdz [degrees shape] (rz (deg2rad degrees) shape))
 
+(defn add-vec  [& args]
+  "Add two or more vectors together"
+  (when  (seq args) 
+    (apply mapv + args)))
+
+(defn sub-vec  [& args]
+  "Subtract two or more vectors together"
+  (when  (seq args) 
+    (apply mapv - args)))
+
+(defn div-vec  [& args]
+  "Divide two or more vectors together"
+  (when  (seq args) 
+    (apply mapv / args)))
+
 ;;;;;;;;;;;;;;;;;;;;;;
 ;; Shape parameters ;;
 ;;;;;;;;;;;;;;;;;;;;;;
@@ -139,6 +154,7 @@
 (def sa-profile-key-height 7.39)
 
 (def plate-thickness 3)
+(def bottom-thickness (* 0.2 8)) ; 8 0.2mm layers
 (def mount-padding 1.5)
 (def side-nub-thickness 3.0)
 (def side-nub-size [(+ mount-padding 1.0) 3 side-nub-thickness])
@@ -183,14 +199,16 @@
 
 (def single-plate-side-nubs (union single-plate-side-nub (mirror [1 0 0] single-plate-side-nub)))
 
-(def single-plate
-  (->> (union
-         (difference
-           (single-plate-outer-cube plate-thickness)
-           (single-plate-cut (+ 1 plate-thickness)))
-         single-plate-side-nubs)
-       )
-  )
+(defn key-hole [filled]
+  (->> (if filled
+         (single-plate-outer-cube plate-thickness) 
+         (union
+           (difference (single-plate-outer-cube plate-thickness)
+                       (single-plate-cut (+ 1 plate-thickness)))
+           single-plate-side-nubs
+           ))
+       (tz plate-thickness)
+       ))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;; OLED screen holder ;;
@@ -370,31 +388,6 @@
 (defn key-position [column row position]
   (apply-key-geometry (partial map +) rotate-around-x rotate-around-y column row position))
 
-(defn key-hole [column row]
-  (->> (union
-         (difference (single-plate-outer-cube plate-thickness)
-                     (single-plate-cut (+ 1 plate-thickness)))
-         single-plate-side-nubs
-         )
-                   
-       (tz plate-thickness)
-       (key-place column row)
-       ))
-
-(def key-holes
-  (apply union
-         (for [column columns row rows :when (or (.contains [3] column) (not= row lastrow))]
-           (key-hole column row))))
-
-(def caps
-  (apply union
-         (for [column columns
-               row rows
-               :when (or (.contains [3] column)
-                         (not= row lastrow))]
-           (->> (sa-cap (if (and (true? pinky-15u) (= column lastcol)) 1.5 1))
-                (key-place column row)))))
-
 ;;;;;;;;;;;;;;;;;;;;
 ;; Web Connectors ;;
 ;;;;;;;;;;;;;;;;;;;;
@@ -467,7 +460,7 @@
           ;;
 )))
 
-(def connectors
+(def key-connectors
   (union
     (apply union
            (concat
@@ -579,11 +572,11 @@
    (thumb-1x-layout (sa-cap 1))
    (thumb-15x-layout (rotate (/ π 2) [0 0 1] (sa-cap 1.25)))))
 
-(def thumb
+(defn thumb-holes [filled]
   (->>
     (union
-      (thumb-1x-layout (tz plate-thickness single-plate))
-      (thumb-15x-layout (tz plate-thickness single-plate))
+      (thumb-1x-layout (key-hole filled))
+      (thumb-15x-layout (key-hole filled))
       )
     ))
 
@@ -652,12 +645,6 @@
        (key-place column cornerrow web-post-br)
        )
      )
-   ;(triangle-hulls
-    ;(key-place 0 cornerrow (web-post-bl-e 0 -2))
-    ;(key-place 0 cornerrow web-post-bl)
-    ;(key-place 0 cornerrow (web-post-br-e 0 -2))
-    ;(key-place 0 cornerrow web-post-br)
-     ;)
      (triangle-hulls
        (thumb-tm-place web-post-tl)
        (key-place 0 cornerrow web-post-bl)
@@ -709,31 +696,42 @@
     )
   )
 
-;;;;;;;;;;
-;; OLED ;;
-;;;;;;;;;;
+;;;;;;;;;;;;;;;
+;; keys/caps ;;
+;;;;;;;;;;;;;;;
 
-(defn add-vec  [& args]
-  "Add two or more vectors together"
-  (when  (seq args) 
-    (apply mapv + args)))
+(def connectors
+  (union
+    key-connectors
+    thumb-connectors
+    )
+  )
 
-(defn sub-vec  [& args]
-  "Subtract two or more vectors together"
-  (when  (seq args) 
-    (apply mapv - args)))
+(defn key-holes [filled]
+  (union
+    (apply union
+           (for [column columns row rows :when (or (.contains [3] column) (not= row lastrow))]
+             (->> (key-hole filled)
+                  (key-place column row))
+             ))
+  (thumb-holes filled)
+  ))
 
-(defn div-vec  [& args]
-  "Divide two or more vectors together"
-  (when  (seq args) 
-    (apply mapv / args)))
+(def caps
+  (union
+    (apply union
+           (for [column columns
+                 row rows
+                 :when (or (.contains [3] column)
+                           (not= row lastrow))]
+             (->> (sa-cap (if (and (true? pinky-15u) (= column lastcol)) 1.5 1))
+                  (key-place column row))))
+    thumbcaps
+    ))
 
-
-(def oled-holder
+(def oled-holder-cut
   (->>
-    (difference
-      ; main body
-      (apply cube oled-holder-size)
+    (union
       ; cut for oled pcb
       (translate [0 0 1] (apply cube (add-vec [0.5 0.5 0.1] oled-pcb-size)))
       ; cut for oled screen
@@ -750,7 +748,16 @@
       (for [x [-2 2] y [-2 2]]
         (translate (div-vec oled-mount-size [x y 1]) (cylinder (/ 2.5 2) 10)))
       )
-    (rotate (deg2rad 180) [0 1 0])
+    (rdy 180)
+    (translate [0 0 (/ oled-holder-thickness 2)])
+    )
+  )
+
+(def oled-holder
+  (->>
+    ; main body
+    (apply cube oled-holder-size)
+    (rdy 180)
     (translate [0 0 (/ oled-holder-thickness 2)])
     )
   )
@@ -759,13 +766,14 @@
 ;; Case ;;
 ;;;;;;;;;;
 
-(defn bottom [height p]
+(defn project-extrude [height p]
   (->> (project p)
        (extrude-linear {:height height :twist 0 :convexity 0})
-       (translate [0 0 (- (/ height 2) 10)])))
+       (tz (/ height 2))
+       ))
 
-(defn bottom-hull [& p]
-  (hull p (bottom 0.001 p)))
+(defn project-extrude-hull [& p]
+  (hull p (project-extrude 0.001 p)))
 
 (defn cut-bottom [shape] (difference shape (translate [0 0 -20] (cube 1000 1000 40))))
 
@@ -826,7 +834,7 @@
     (place2 (translate (wall-locate1 dx2 dy2) post2))
     (place2 (translate (wall-locate2 dx2 dy2) post2))
     (place2 (translate (wall-locate3 dx2 dy2) post2)))
-   (bottom-hull
+   (project-extrude-hull
     (place1 (translate (wall-locate2 dx1 dy1) post1))
     (place1 (translate (wall-locate3 dx1 dy1) post1))
     (place2 (translate (wall-locate2 dx2 dy2) post2))
@@ -837,25 +845,9 @@
   (wall-brace (partial key-place x1 y1) dx1 dy1 post1
               (partial key-place x2 y2) dx2 dy2 post2))
 
-(def right-wall
-  (let [tr (if (true? pinky-15u) wide-post-tr web-post-tr)
-        br (if (true? pinky-15u) wide-post-br web-post-br)]
-    (union (key-wall-brace lastcol 0 0 1 tr lastcol 0 1 0 tr)
-           (for [y (range 0 lastrow)] (key-wall-brace lastcol y 1 0 tr lastcol y 1 0 br))
-           (for [y (range 1 lastrow)] (key-wall-brace lastcol (dec y) 1 0 br lastcol y 1 0 tr))
-           (key-wall-brace lastcol cornerrow 0 -1 br lastcol cornerrow 1 0 br))))
-
-(def left-wall
+(def left-section
   (union
-    (wall-brace  (partial key-place 0 0) 0 1 web-post-tl  (partial left-wall-plate-place 1 1) 0 1 oled-post)
-    (wall-brace  (partial left-wall-plate-place 1 1) 0 1 oled-post  (partial left-wall-plate-place -1 1) 0 1 oled-post)
-    (wall-brace  (partial left-wall-plate-place -1 1) 0 1 oled-post  (partial left-wall-plate-place -1 1) -1 0 oled-post)
-    (wall-brace  (partial left-wall-plate-place -1 1) -1 0 oled-post  (partial left-wall-plate-place -1 -1) -1 -1 oled-post)
     (left-wall-plate-place 0 0 oled-holder)
-
-    (wall-brace  (partial left-wall-plate-place -1 -1) -1 -1 oled-post  thumb-tl-place -1 0 web-post-tl)
-    (wall-brace  thumb-tl-place -1 0 web-post-tl thumb-tl-place -1 0 web-post-bl)
-
     (triangle-hulls
       (left-wall-plate-place 1 1 oled-post)
       (key-place 0 0 web-post-tl)
@@ -897,52 +889,59 @@
       (key-place 0 2 web-post-tl)
       (key-place 0 2 web-post-bl)
       (thumb-tm-place web-post-tl)
-      )
-    )
-  )
-
-(def pinky-walls
-  (union
-   (key-wall-brace lastcol cornerrow 0 -1 web-post-br lastcol cornerrow 0 -1 wide-post-br)
-   (key-wall-brace lastcol 0 0 1 web-post-tr lastcol 0 0 1 wide-post-tr)))
+      )))
 
 (def case-walls
   (union
-   right-wall
-   pinky-walls
-   ; back wall
-   (for [x (range 0 ncols)] (key-wall-brace x 0 0 1 web-post-tl x       0 0 1 web-post-tr))
-   (for [x (range 1 ncols)] (key-wall-brace x 0 0 1 web-post-tl (dec x) 0 0 1 web-post-tr))
-   left-wall
-   ; front wall
-   (key-wall-brace 3 lastrow   0 -1 web-post-bl 3 lastrow 0.5 -1 web-post-br)
-   (key-wall-brace 3 lastrow 0.5 -1 web-post-br 4 cornerrow 0.5 -1 web-post-bl)
-   (for [x (range 4 ncols)] (key-wall-brace x cornerrow 0 -1 web-post-bl x       cornerrow 0 -1 web-post-br)) ; TODO fix extra wall
-   (for [x (range 5 ncols)] (key-wall-brace x cornerrow 0 -1 web-post-bl (dec x) cornerrow 0 -1 web-post-br))
-   ; thumb walls
-   (wall-brace thumb-br-place  0 -1 web-post-br thumb-tr-place  0 -1 thumb-post-br)
-   (wall-brace thumb-br-place  0 -1 web-post-br thumb-br-place  0 -1 web-post-bl)
-   (wall-brace thumb-ttr-place  0 -1 web-post-br thumb-ttr-place  0 -1 web-post-bl)
-   (wall-brace thumb-bl-place  0 -1 web-post-br thumb-bl-place  0 -1 web-post-bl)
-   ;(wall-brace thumb-tl-place  0  1 web-post-tr thumb-tl-place  0  1 web-post-tl)
-   (wall-brace thumb-bl-place -1  0 web-post-tl thumb-bl-place -1  0 web-post-bl)
-   (wall-brace thumb-tl-place -1  0 web-post-tl thumb-tl-place -1  0 web-post-bl)
-   ; thumb corners
-   (wall-brace thumb-bl-place -1  0 web-post-bl thumb-bl-place  0 -1 web-post-bl)
-   ; thumb tweeners
-   (wall-brace thumb-br-place  0 -1 web-post-bl thumb-bl-place  0 -1 web-post-br)
-   (wall-brace thumb-tl-place -1  0 web-post-bl thumb-bl-place -1  0 web-post-tl)
-   (wall-brace thumb-tr-place 0  -1 web-post-br thumb-ttr-place 0  -1 web-post-bl)
-   (wall-brace thumb-ttr-place  0 -1 thumb-post-br (partial key-place 3 lastrow)  0 -1 web-post-bl)
-   )
-  )
+    ; right-wall
+    (let [tr (if (true? pinky-15u) wide-post-tr web-post-tr)
+          br (if (true? pinky-15u) wide-post-br web-post-br)]
+      (union (key-wall-brace lastcol 0 0 1 tr lastcol 0 1 0 tr)
+             (for [y (range 0 lastrow)] (key-wall-brace lastcol y 1 0 tr lastcol y 1 0 br))
+             (for [y (range 1 lastrow)] (key-wall-brace lastcol (dec y) 1 0 br lastcol y 1 0 tr))
+             (key-wall-brace lastcol cornerrow 0 -1 br lastcol cornerrow 1 0 br)))
+    ; pinky-walls
+    (key-wall-brace lastcol cornerrow 0 -1 web-post-br lastcol cornerrow 0 -1 wide-post-br)
+    (key-wall-brace lastcol 0 0 1 web-post-tr lastcol 0 0 1 wide-post-tr)
+    ; back wall
+    (for [x (range 0 ncols)] (key-wall-brace x 0 0 1 web-post-tl x       0 0 1 web-post-tr))
+    (for [x (range 1 ncols)] (key-wall-brace x 0 0 1 web-post-tl (dec x) 0 0 1 web-post-tr))
+    ; left-wall
+    (wall-brace  (partial key-place 0 0) 0 1 web-post-tl  (partial left-wall-plate-place 1 1) 0 1 oled-post)
+    (wall-brace  (partial left-wall-plate-place 1 1) 0 1 oled-post  (partial left-wall-plate-place -1 1) 0 1 oled-post)
+    (wall-brace  (partial left-wall-plate-place -1 1) 0 1 oled-post  (partial left-wall-plate-place -1 1) -1 0 oled-post)
+    (wall-brace  (partial left-wall-plate-place -1 1) -1 0 oled-post  (partial left-wall-plate-place -1 -1) -1 -1 oled-post)
+    (wall-brace  (partial left-wall-plate-place -1 -1) -1 -1 oled-post  thumb-tl-place -1 0 web-post-tl)
+    (wall-brace  thumb-tl-place -1 0 web-post-tl thumb-tl-place -1 0 web-post-bl)
+    ; front wall
+    (key-wall-brace 3 lastrow   0 -1 web-post-bl 3 lastrow 0.5 -1 web-post-br)
+    (key-wall-brace 3 lastrow 0.5 -1 web-post-br 4 cornerrow 0.5 -1 web-post-bl)
+    (for [x (range 4 ncols)] (key-wall-brace x cornerrow 0 -1 web-post-bl x       cornerrow 0 -1 web-post-br)) ; TODO fix extra wall
+    (for [x (range 5 ncols)] (key-wall-brace x cornerrow 0 -1 web-post-bl (dec x) cornerrow 0 -1 web-post-br))
+    ; thumb walls
+    (wall-brace thumb-br-place  0 -1 web-post-br thumb-tr-place  0 -1 thumb-post-br)
+    (wall-brace thumb-br-place  0 -1 web-post-br thumb-br-place  0 -1 web-post-bl)
+    (wall-brace thumb-ttr-place  0 -1 web-post-br thumb-ttr-place  0 -1 web-post-bl)
+    (wall-brace thumb-bl-place  0 -1 web-post-br thumb-bl-place  0 -1 web-post-bl)
+    ;(wall-brace thumb-tl-place  0  1 web-post-tr thumb-tl-place  0  1 web-post-tl)
+    (wall-brace thumb-bl-place -1  0 web-post-tl thumb-bl-place -1  0 web-post-bl)
+    (wall-brace thumb-tl-place -1  0 web-post-tl thumb-tl-place -1  0 web-post-bl)
+    ; thumb corners
+    (wall-brace thumb-bl-place -1  0 web-post-bl thumb-bl-place  0 -1 web-post-bl)
+    ; thumb tweeners
+    (wall-brace thumb-br-place  0 -1 web-post-bl thumb-bl-place  0 -1 web-post-br)
+    (wall-brace thumb-tl-place -1  0 web-post-bl thumb-bl-place -1  0 web-post-tl)
+    (wall-brace thumb-tr-place 0  -1 web-post-br thumb-ttr-place 0  -1 web-post-bl)
+    (wall-brace thumb-ttr-place  0 -1 thumb-post-br (partial key-place 3 lastrow)  0 -1 web-post-bl)
+    ))
+
 
 ; Cutout for controller/trrs jack holder
 (def controller-ref (key-position 0 0 (map - (wall-locate2  0  -1) [0 (/ mount-height 2) 0])))
 (def controller-cutout-pos (map + [-21 19.8 0] [(first controller-ref) (second controller-ref) 2]))
 
 (def controller-holder-stl-pos
-   (add-vec controller-cutout-pos [16.4 -23.9 -2.0]))
+  (add-vec controller-cutout-pos [16.4 -23.9 -2.0]))
 
 (def controller-holder-stl
   (->> (import "controller holder.stl")
@@ -1015,9 +1014,11 @@
 (def screw-insert-top-radius (/ 4.0 2))
 (def screw-insert-holes  (screw-insert-all-shapes screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
 
+(def screw-radius (/ 2.5 2))
+(def screw-holes  (screw-insert-all-shapes screw-radius screw-radius screw-insert-height))
+
 ; Wall Thickness W:\t1.65
 (def screw-insert-outers (screw-insert-all-shapes (+ screw-insert-bottom-radius 1.65) (+ screw-insert-top-radius 1.65) (+ screw-insert-height 1.5)))
-(def screw-insert-screw-holes  (screw-insert-all-shapes 1.5 1.5 350))
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;;;;Wrist rest;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1085,7 +1086,7 @@
          (tz (/ wrist-rest-back-height 2))
          (rdx wrist-rest-angle)
          (rdy wrist-rest-y-angle)
-         (bottom-hull)
+         (project-extrude-hull)
          )
 
     ; subtract inner cut, which fits the wrist rest gel pad
@@ -1173,17 +1174,31 @@
 (def model-right (cut-bottom
                    (difference
                      (union
-                       key-holes
+                       (key-holes false)
+                       left-section
                        connectors
-                       thumb
-                       thumb-connectors
                        (difference case-walls-with-screws
                                    (controller-cutout case-walls-with-screws)
                                    ))
                      (if (== wrist-rest-on 1) (->> rest-case-cuts	(translate [(+ (first thumborigin ) 33) (- (second thumborigin)  (- 56 nrows)) 0])))
+                     (left-wall-plate-place 0 0 oled-holder-cut)
                      screw-insert-holes
                      encoder-cutout
                      )))
+
+(def plate-right
+  (difference
+    (project-extrude
+      bottom-thickness
+      (union
+        (key-holes true)
+        left-section
+        connectors
+        case-walls-with-screws
+        )
+      )
+    (tz -0.1 screw-holes)
+    ))
 
 
 (defn flat-plate [nx ny thickness]
@@ -1209,8 +1224,10 @@
 
 (spit "things/right.scad"
       (write-scad
-        (union model-right
-               (-% controller-holder-stl))
+        (union 
+          model-right
+          (-% controller-holder-stl)
+          )
         ))
 
 ;(spit "things/left.scad"
@@ -1221,8 +1238,6 @@
         ;(union
           ;model-right
           ;caps
-          ;thumbcaps
-
 			;;(if (== bottom-cover 1) (->> model-plate-right))
 			;(if (== wrist-rest-on 1) (->> wrist-rest-build 		)		)
           ;)
@@ -1230,14 +1245,13 @@
       ;)
 
 
-;(spit "things/right-plate.scad"
-      ;(write-scad
-       ;(cut
-        ;(translate [0 0 -0.1]
-                   ;(difference (union case-walls
-                                      ;pinky-walls
-                                      ;screw-insert-outers)
-                               ;(translate [0 0 -10] screw-insert-screw-holes))))))
+(spit "things/right-plate.scad"
+      (write-scad
+        (union
+          ;model-right
+          plate-right
+          )
+        ))
 
 
 ;(spit "things/wrist-rest.scad"
