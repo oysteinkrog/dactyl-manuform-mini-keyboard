@@ -959,7 +959,7 @@
 
 (defn intersect-bottom [a b]
   (->> (project (intersection a b))
-       (extrude-linear {:height 12.6 :twist 0 :convexity 0})
+       (extrude-linear {:height 19 :twist 0 :convexity 0})
        (translate [0 0 (/ 12.6 2)])
        )
   )
