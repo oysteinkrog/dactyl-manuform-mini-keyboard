@@ -85,7 +85,8 @@
 
 (defn column-offset [column] (cond
                                (= column 2) [0 2.82 -4.0]
-                               (>= column 4) [0 -14 4.64]            ; original [0 -5.8 5.64]
+                               (= column 4) [0 -15 4.64]            ; original [0 -5.8 5.64]
+                               (= column 5) [0 -14 4.64]            ; original [0 -5.8 5.64]
                                :else [0 0 0]))
 
 (def thumb-offsets [4 -3 7])
@@ -1003,7 +1004,7 @@
          ; thumb cluster, closest to user
          (screw-insert 1 lastrow         bottom-radius top-radius height [-2 -13 0])
          ; thumb cluster left
-         (screw-insert 0 lastrow   bottom-radius top-radius height [19 -80 0])
+         (screw-insert 0 lastrow   bottom-radius top-radius height [19.5 -80 0])
 ))
 
 ; Hole Depth Y: 4.4
@@ -1132,9 +1133,9 @@
   (ty 10
       (difference
         (union
-          (scale [1 1 1.6] (->> (cylinder 6 50)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x 5 0])));;right
-          (scale [1 1 1.6] (->> (cylinder 6 50)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x -2 0])))
-          (scale [1 1 1.6] (->> (cylinder 6 60)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x -6 0])))
+          (scale [1 1 1.6] (->> (cylinder 6 37)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x 5 0])));;right
+          (scale [1 1 1.6] (->> (cylinder 6 43)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x -2 0])))
+          (scale [1 1 1.6] (->> (cylinder 6 55)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x -6 0])))
           )
         ))
   )
