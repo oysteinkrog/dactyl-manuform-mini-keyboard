@@ -158,7 +158,7 @@
 (def bottom-thickness (* 0.2 8)) ; 8 0.2mm layers
 (def mount-padding 1.5)
 (def side-nub-thickness 3.0)
-(def side-nub-size [(+ mount-padding 1.0) 3 side-nub-thickness])
+(def side-nub-size [(+ mount-padding 0.8) 3 side-nub-thickness])
 (def mount-width (+ keyswitch-width (* mount-padding 2)))
 (def mount-height (+ keyswitch-height (* mount-padding 2)))
 
