@@ -93,7 +93,7 @@
 (def keyboard-z-offset 9)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
 (def extra-width 2.5)                   ; extra space between the base of keys; original= 2
-(def extra-height 2.5)                  ; original= 0.5
+(def extra-height 0.5)                  ; original= 0.5
 
 (def wall-z-offset -5)                 ; original=-15 length of the first downward-sloping part of the wall (negative)
 (def wall-xy-offset 5)                  ; offset in the x and/or y direction for the first downward-sloping part of the wall (negative)
@@ -993,7 +993,7 @@
          ; top left, near usb/trrs
          (screw-insert 0 0         bottom-radius top-radius height [5.8 -3 0])
          ; middle top
-         (screw-insert 3 0         bottom-radius top-radius height [-9 0 0])
+         (screw-insert 3 0         bottom-radius top-radius height [-9 -1 0])
          ; top right
          (screw-insert lastcol 0         bottom-radius top-radius height [-4 9 0])
          ; lower right
@@ -1003,7 +1003,7 @@
          ; thumb cluster, closest to user
          (screw-insert 1 lastrow         bottom-radius top-radius height [-2 -13 0])
          ; thumb cluster left
-         (screw-insert 0 lastrow   bottom-radius top-radius height [16 -80 0])
+         (screw-insert 0 lastrow   bottom-radius top-radius height [19 -80 0])
 ))
 
 ; Hole Depth Y: 4.4
