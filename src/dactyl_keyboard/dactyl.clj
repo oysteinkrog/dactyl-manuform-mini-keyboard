@@ -961,7 +961,7 @@
 
 (defn controller-cutout [shape] (intersect-bottom controller-holder-stl shape))
 
-(def encoder-pos (add-vec (left-wall-plate-position 0 -1) [0 -11 0]))
+(def encoder-pos (add-vec (left-wall-plate-position 0 -1) [0 -13 0]))
 (def encoder-rot-x oled-mount-rotation-x)
 (def encoder-rot-z oled-mount-rotation-z)
 (def encoder-cutout-shape (cylinder (/ 6.5 2) 1000))
