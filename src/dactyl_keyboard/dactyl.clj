@@ -215,9 +215,11 @@
 ;; OLED screen holder ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
 
-(def oled-pcb-size [27.35 28.3 plate-thickness])
-(def oled-screen-offset [0 -1 0])
-(def oled-screen-size [24.65 16.65 (+ 0.1 plate-thickness)])
+(def oled-pcb-size [27.35 28.3 (- plate-thickness 1)])
+(def oled-screen-offset [0 -0.5 0])
+(def oled-screen-size [24.65 16.65 (- plate-thickness 1)])
+(def oled-viewport-size [24.0 13.0 (+ 0.1 plate-thickness)])
+(def oled-viewport-offset [0 1.0 0])
 (def oled-mount-size [23.1 23.75 0.5])
 (def oled-holder-width (+ 3 (nth oled-pcb-size 0)))
 (def oled-holder-height (+ 3 (nth oled-pcb-size 1)))
@@ -734,14 +736,20 @@
   (->>
     (union
       ; cut for oled pcb
-      (translate [0 0 1] (apply cube (add-vec [0.5 0.5 0.1] oled-pcb-size)))
+      (difference 
+        (translate [0 0 1] (apply cube (add-vec [0.5 0.5 0.1] oled-pcb-size)))
+        (for [x [-2 2] y [-2 2]]
+          (translate (div-vec oled-mount-size [x y 1])
+                     (cylinder 2.5 (- oled-holder-thickness 2.5))))
+        )
       ; cut for oled screen
       (translate oled-screen-offset (apply cube oled-screen-size))
+      ; cut for oled screen viewport
+      (translate oled-viewport-offset (apply cube oled-viewport-size))
       ; cutout for oled cable
       (->> (cube 10 2 10)
            (translate oled-screen-offset)
-           (translate [0 (- (+ (/ (nth oled-screen-size 1) 2) 1)) (+ plate-thickness 1.0)])
-           )
+           (translate [0 (- (+ (/ (nth oled-screen-size 1) 2) 1)) (+ plate-thickness 1.0)]))
       (for [x [-2 2] y [-2 2]]
         (translate (div-vec oled-mount-size [x y 1]) (cylinder (/ 2.5 2) 10)))
       )
