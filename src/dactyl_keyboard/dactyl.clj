@@ -523,7 +523,7 @@
 ;top middle
 (defn thumb-tm-place [shape]
   (->> shape
-       (rotate (deg2rad   7) [1 0 0])
+       (rotate (deg2rad   8) [1 0 0])
        (rotate (deg2rad -23) [0 1 0])
        (rotate (deg2rad  19) [0 0 1]) ; original 10
        (translate thumborigin)
