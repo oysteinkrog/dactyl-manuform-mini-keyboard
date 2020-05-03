@@ -737,14 +737,10 @@
       (translate [0 0 1] (apply cube (add-vec [0.5 0.5 0.1] oled-pcb-size)))
       ; cut for oled screen
       (translate oled-screen-offset (apply cube oled-screen-size))
-      ; cutout for connector pins
-      (->> (cube 10 3 10)
-           (translate [0 (- (/ (nth oled-pcb-size 1) 2) 2) (+ plate-thickness 1.0)])
-           )
       ; cutout for oled cable
       (->> (cube 10 2 10)
            (translate oled-screen-offset)
-           (translate [0 (- (+ (/ (nth oled-screen-size 1) 2) 1)) (+ plate-thickness 0.8)])
+           (translate [0 (- (+ (/ (nth oled-screen-size 1) 2) 1)) (+ plate-thickness 1.0)])
            )
       (for [x [-2 2] y [-2 2]]
         (translate (div-vec oled-mount-size [x y 1]) (cylinder (/ 2.5 2) 10)))
