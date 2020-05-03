@@ -556,6 +556,7 @@
 
 (defn thumb-1x-layout [shape]
   (union
+   (thumb-tl-place shape)
    (thumb-br-place shape)
    (thumb-bl-place shape)
    ))
@@ -565,7 +566,6 @@
    (thumb-ttr-place shape)
    (thumb-tr-place shape)
    (thumb-tm-place shape)
-   (thumb-tl-place shape)
    ))
 
 (def thumbcaps
