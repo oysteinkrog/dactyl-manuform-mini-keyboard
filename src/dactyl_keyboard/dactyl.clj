@@ -946,7 +946,7 @@
 (def controller-cutout-pos (map + [-21 19.8 0] [(first controller-ref) (second controller-ref) 2]))
 
 (def controller-holder-stl-pos
-  (add-vec controller-cutout-pos [16.4 -23.9 -2.0]))
+  (add-vec controller-cutout-pos [-6.0 -31.5 -2.0]))
 
 (def controller-holder-stl
   (->> (import "controller holder.stl")
