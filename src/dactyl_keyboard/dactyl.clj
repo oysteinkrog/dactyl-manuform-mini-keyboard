@@ -73,9 +73,9 @@
 (def nrows 4)
 (def ncols 6)
 
-(def α (/ π 14))                        ; curvature of the columns
+(def α (/ π 10))                        ; curvature of the columns
 (def β (/ π 36))                        ; curvature of the rows
-(def centerrow (- nrows 2.3))             ; controls front-back tilt
+(def centerrow (- nrows 2.4))             ; controls front-back tilt
 (def centercol 2)                       ; controls left-right tilt / tenting (higher number is more tenting)
 (def tenting-angle (/ π 12))            ; or, change this for more precise tenting control
 (def column-style
@@ -943,7 +943,7 @@
 
 ; Cutout for controller/trrs jack holder
 (def controller-ref (key-position 0 0 (map - (wall-locate2  0  -1) [0 (/ mount-height 2) 0])))
-(def controller-cutout-pos (map + [-21 19.8 0] [(first controller-ref) (second controller-ref) 2]))
+(def controller-cutout-pos (map + [-21 19.0 0] [(first controller-ref) (second controller-ref) 2]))
 
 (def controller-holder-stl-pos
   (add-vec controller-cutout-pos [-6.0 -31.5 -2.0]))
@@ -1000,9 +1000,9 @@
          ; middle top
          (screw-insert 3 0         bottom-radius top-radius height [-9 -1 0])
          ; top right
-         (screw-insert lastcol 0         bottom-radius top-radius height [-4 9 0])
+         (screw-insert lastcol 0         bottom-radius top-radius height [-4 7 0])
          ; lower right
-         (screw-insert lastcol lastrow  bottom-radius top-radius height [-4 13 0])
+         (screw-insert lastcol lastrow  bottom-radius top-radius height [-4 14 0])
          ; middle bottom
          (screw-insert 3 lastrow         bottom-radius top-radius height [-5 2 0])
          ; thumb cluster, closest to user
