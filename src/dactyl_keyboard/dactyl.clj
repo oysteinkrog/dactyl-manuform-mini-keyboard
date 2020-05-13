@@ -116,7 +116,7 @@
 (def wrist-rest-on 1) 						;;0 for no rest 1 for a rest connection cut out in bottom case
 (def wrist-rest-back-height 18)				;;height of the back of the wrist rest--Default 34
 (def wrist-rest-angle -1) 			        ;;angle of the wrist rest--Default 20
-(def wrist-rest-rotation-angle 100)			;;0 default The angle in counter clockwise the wrist rest is at
+(def wrist-rest-rotation-angle 4)			;;0 default The angle in counter clockwise the wrist rest is at
 (def wrist-rest-ledge 3.5)					;;The height of ledge the silicone wrist rest fits inside
 (def wrist-rest-y-angle 0)					;;0 Default.  Controls the wrist rest y axis tilt (left to right)
 (def wrist-rest-rounding 3)
@@ -126,7 +126,7 @@
 (def right_wrist_connecter_x   (if (== ncols 5) 13 25))
 (def middle_wrist_connecter_x   (if (== ncols 5) -5 0))
 (def left_wrist_connecter_x   (if (== ncols 5) -25 -25))
-(def wrist_brse_position [15 -40 0])
+(def wrist_brse_position [3 -23 0])
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; General variables ;;
@@ -1259,8 +1259,8 @@
         ))
 
 
-;(spit "things/wrist-rest.scad"
-      ;(write-scad wrist-rest-build))
+(spit "things/wrist-rest.scad"
+      (write-scad wrist-rest-build))
 
 ;(spit "things/caps-crash-test.scad"
       ;(write-scad
