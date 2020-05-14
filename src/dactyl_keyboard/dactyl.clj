@@ -1170,7 +1170,7 @@
          (translate [(+ (first thumborigin ) 33) (- (second thumborigin) 50) 0])
          )
     (translate [(+ (first thumborigin ) 33) (- (second thumborigin) 50) 0] rest-case-cuts)
-    wrist-rest-case-wall-cut
+    (project-extrude 1000 wrist-rest-case-wall-cut)
     )
 )
 
