@@ -1098,7 +1098,7 @@
     (->>
       (wrist-rest 1000)
       (tz (/ wrist-rest-back-height 2))
-      (tz 9)
+      (tz 10.5)
       (tz (- wrist-rest-ledge))
       (rdx wrist-rest-angle)
       (rdy wrist-rest-y-angle)
