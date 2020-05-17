@@ -957,14 +957,14 @@
      )
   )
 
-(defn intersect-bottom [a b]
+(defn intersect-bottom [a b height]
   (->> (project (intersection a b))
-       (extrude-linear {:height 19 :twist 0 :convexity 0})
-       (translate [0 0 (/ 12.6 2)])
+       (extrude-linear {:height height :twist 0 :convexity 0})
+       (translate [0 0 (/ height 2)])
        )
   )
 
-(defn controller-cutout [shape] (intersect-bottom controller-holder-stl shape))
+(defn controller-cutout [shape] (intersect-bottom controller-holder-stl shape 19))
 
 (def encoder-pos (add-vec (left-wall-plate-position 0 -1) [0 -13 0]))
 (def encoder-rot-x oled-mount-rotation-x)
