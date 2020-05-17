@@ -91,7 +91,7 @@
 
 (def thumb-offsets [4 -3 7])
 
-(def keyboard-z-offset 15)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
+(def keyboard-z-offset 14)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
 (def extra-width 2.2)                   ; extra space between the base of keys; original= 2
 (def extra-height 1.1)                  ; original= 0.5
@@ -946,7 +946,7 @@
 (def controller-cutout-pos (map + [-21 19.0 0] [(first controller-ref) (second controller-ref) 2]))
 
 (def controller-holder-stl-pos
-  (add-vec controller-cutout-pos [-6.0 -31.5 -2.0]))
+  (add-vec controller-cutout-pos [-5.0 -32.9 -2.0]))
 
 (def controller-holder-stl
   (->> (import "controller holder.stl")
@@ -996,7 +996,7 @@
 (defn screw-insert-all-shapes [bottom-radius top-radius height]
   (union 
          ; top left, near usb/trrs
-         (screw-insert 0 0         bottom-radius top-radius height [5.8 -3 0])
+         (screw-insert 0 0         bottom-radius top-radius height [5.8 -4 0])
          ; middle top
          (screw-insert 3 0         bottom-radius top-radius height [-9 -1 0])
          ; top right
