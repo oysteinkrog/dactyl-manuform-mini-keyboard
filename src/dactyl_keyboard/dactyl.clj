@@ -1238,16 +1238,16 @@
 ;(spit "things/left.scad"
       ;(write-scad (mirror [-1 0 0] model-right)))
 
-;(spit "things/right-test.scad"
-      ;(write-scad
-        ;(union
-          ;model-right
-          ;caps
-			;;(if (== bottom-cover 1) (->> model-plate-right))
-			;(if (== wrist-rest-on 1) (->> wrist-rest-build 		)		)
-          ;)
-        ;)
-      ;)
+(spit "things/right-test.scad"
+      (write-scad
+        (union
+          model-right
+          caps
+            ;(if (== bottom-cover 1) (->> model-plate-right))
+            (if (== wrist-rest-on 1) (->> wrist-rest-build 		)		)
+          )
+        )
+      )
 
 
 (spit "things/right-plate.scad"
