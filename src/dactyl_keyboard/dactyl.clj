@@ -49,6 +49,11 @@
 (defn rdy [degrees shape] (ry (deg2rad degrees) shape))
 (defn rdz [degrees shape] (rz (deg2rad degrees) shape))
 
+(defn rd [x y z shape] (->> shape
+                               (rdx x)
+                               (rdy y)
+                               (rdz z)))
+
 (defn add-vec  [& args]
   "Add two or more vectors together"
   (when  (seq args) 
@@ -512,49 +517,37 @@
 ;top top right
 (defn thumb-ttr-place [shape]
   (->> shape
-       (rotate (deg2rad  3) [1 0 0])
-       (rotate (deg2rad -2) [0 1 0])
-       (rotate (deg2rad 7) [0 0 1])
+       (rd 3 -2 7)
        (translate thumborigin)
        (translate [3 -5 6])))
 ;top right
 (defn thumb-tr-place [shape]
   (->> shape
-       (rotate (deg2rad   7) [1 0 0])
-       (rotate (deg2rad -8) [0 1 0])
-       (rotate (deg2rad  13) [0 0 1]) ; original 10
+       (rd 7 -8 13)
        (translate thumborigin)
        (translate [-16 -8 4]))) ; original 1.5u  (translate [-12 -16 3])
 ;top middle
 (defn thumb-tm-place [shape]
   (->> shape
-       (rotate (deg2rad   8) [1 0 0])
-       (rotate (deg2rad -23) [0 1 0])
-       (rotate (deg2rad  19) [0 0 1]) ; original 10
+       (rd 8 -23 19)
        (translate thumborigin)
        (translate [-33.5 -13 -0.5]))) ; original 1.5u (translate [-32 -15 -2])))
 ; top left
 (defn thumb-tl-place [shape]
   (->> shape
-       (rotate (deg2rad   9) [1 0 0])
-       (rotate (deg2rad -32) [0 1 0])
-       (rotate (deg2rad  23) [0 0 1])
+       (rd 9 -32 23)
        (translate thumborigin)
        (translate [-48 -21 -9]))) ;        (translate [-50 -25 -12])))
 ; bottom right
 (defn thumb-br-place [shape]
   (->> shape
-       (rotate (deg2rad  10) [1 0 0])
-       (rotate (deg2rad -25) [0 1 0])
-       (rotate (deg2rad  22) [0 0 1])
+       (rd 10 -25 22)
        (translate thumborigin)
        (translate [-24 -32 -4])))
 ; bottom left
 (defn thumb-bl-place [shape]
   (->> shape
-       (rotate (deg2rad  10) [1 0 0])
-       (rotate (deg2rad -34) [0 1 0])
-       (rotate (deg2rad  24) [0 0 1])
+       (rd 10 -34 24)
        (translate thumborigin)
        (translate [-39 -38 -13])))
 
