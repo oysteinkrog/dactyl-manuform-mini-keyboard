@@ -136,7 +136,7 @@
 (def cornerrow (dec lastrow))
 (def lastcol (dec ncols))
 
-(def rounding-radius 1)
+(def rounding-radius (if round-case 1 0))
 ;(def rounding-radius 0)
 
 ;;;;;;;;;;;;;;;;;
@@ -198,7 +198,10 @@
                                 )
   )
 
-(def single-plate-side-nubs (union single-plate-side-nub (mirror [1 0 0] single-plate-side-nub)))
+(def single-plate-side-nubs (if create-side-nubs
+                              (union single-plate-side-nub (mirror [1 0 0] single-plate-side-nub))
+                              
+                              ))
 
 (defn key-hole [filled]
   (->> (if filled
