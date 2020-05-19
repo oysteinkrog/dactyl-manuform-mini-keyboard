@@ -101,8 +101,9 @@
 (def extra-width 2.2)                   ; extra space between the base of keys; original= 2
 (def extra-height 1.1)                  ; original= 0.5
 
-(def wall-z-offset -5)                 ; original=-15 length of the first downward-sloping part of the wall (negative)
-(def wall-xy-offset 5)                  ; offset in the x and/or y direction for the first downward-sloping part of the wall (negative)
+(def wall-z-offset -4)                 ; original=-15 length of the first downward-sloping part of the wall (negative)
+(def wall-xy-offset 3)                  ; offset in the x and/or y direction for the first downward-sloping part of the wall (negative)
+(def wall-xy-offset-thin 1)                  ; offset in the x and/or y direction for the first downward-sloping part of the wall (negative)
 (def wall-thickness 3)                  ; wall thickness parameter; originally 5
 
 ;; Settings for column-style == :fixed
@@ -807,7 +808,7 @@
       [(* mount-width -0.5) (* mount-width 0.5) 0]
       [(* oled-holder-width -0.5) (* oled-holder-height -0.5) 0]
       [(* xdir oled-holder-width 0.5) (* ydir oled-holder-height 0.5) 0]
-      [-3 4 -7]
+      [-3 6 -7]
       )
     )
   )
@@ -821,25 +822,33 @@
   )
 
 (defn wall-locate1 [dx dy] [(* dx wall-thickness) (* dy wall-thickness) -1])
-(defn wall-locate2 [dx dy] [(* dx wall-xy-offset) (* dy wall-xy-offset) wall-z-offset])
-(defn wall-locate3 [dx dy] [(* dx (+ wall-xy-offset wall-thickness)) (* dy (+ wall-xy-offset wall-thickness)) wall-z-offset])
+(defn wall-locate2-xy [dx dy xy] [(* dx xy) (* dy xy) wall-z-offset])
+(defn wall-locate3-xy [dx dy xy] [(* dx (+ xy wall-thickness)) (* dy (+ xy wall-thickness)) wall-z-offset])
+(defn wall-locate2 [dx dy] (wall-locate2-xy dx dy wall-xy-offset)) 
+(defn wall-locate3 [dx dy] (wall-locate3-xy dx dy wall-xy-offset)) 
 
-(defn wall-brace [place1 dx1 dy1 post1 place2 dx2 dy2 post2]
+; with configurable xy offset
+(defn wall-brace-xy [place1 dx1 dy1 post1 place2 dx2 dy2 post2 xy1 xy2]
   (union
    (hull
     (place1 post1)
     (place1 (translate (wall-locate1 dx1 dy1) post1))
-    (place1 (translate (wall-locate2 dx1 dy1) post1))
-    (place1 (translate (wall-locate3 dx1 dy1) post1))
+    (place1 (translate (wall-locate2-xy dx1 dy1 xy1) post1))
+    (place1 (translate (wall-locate3-xy dx1 dy1 xy1) post1))
     (place2 post2)
     (place2 (translate (wall-locate1 dx2 dy2) post2))
-    (place2 (translate (wall-locate2 dx2 dy2) post2))
-    (place2 (translate (wall-locate3 dx2 dy2) post2)))
+    (place2 (translate (wall-locate2-xy dx2 dy2 xy2) post2))
+    (place2 (translate (wall-locate3-xy dx2 dy2 xy2) post2)))
    (project-extrude-hull
-    (place1 (translate (wall-locate2 dx1 dy1) post1))
-    (place1 (translate (wall-locate3 dx1 dy1) post1))
-    (place2 (translate (wall-locate2 dx2 dy2) post2))
-    (place2 (translate (wall-locate3 dx2 dy2) post2))))
+    (place1 (translate (wall-locate2-xy dx1 dy1 xy1) post1))
+    (place1 (translate (wall-locate3-xy dx1 dy1 xy1) post1))
+    (place2 (translate (wall-locate2-xy dx2 dy2 xy2) post2))
+    (place2 (translate (wall-locate3-xy dx2 dy2 xy2) post2))))
+  )
+
+; with default xy offset
+(defn wall-brace [place1 dx1 dy1 post1 place2 dx2 dy2 post2]
+  (wall-brace-xy place1 dx1 dy1 post1 place2 dx2 dy2 post2 wall-xy-offset wall-xy-offset)
   )
 
 (defn key-wall-brace [x1 y1 dx1 dy1 post1 x2 y2 dx2 dy2 post2]
@@ -908,12 +917,12 @@
     (for [x (range 0 ncols)] (key-wall-brace x 0 0 1 web-post-tl x       0 0 1 web-post-tr))
     (for [x (range 1 ncols)] (key-wall-brace x 0 0 1 web-post-tl (dec x) 0 0 1 web-post-tr))
     ; left-wall
-    (wall-brace  (partial key-place 0 0) 0 1 web-post-tl  (partial left-wall-plate-place 1 1) 0 1 oled-post)
-    (wall-brace  (partial left-wall-plate-place 1 1) 0 1 oled-post  (partial left-wall-plate-place -1 1) 0 1 oled-post)
-    (wall-brace  (partial left-wall-plate-place -1 1) 0 1 oled-post  (partial left-wall-plate-place -1 1) -1 0 oled-post)
-    (wall-brace  (partial left-wall-plate-place -1 1) -1 0 oled-post  (partial left-wall-plate-place -1 -1) -1 -1 oled-post)
-    (wall-brace  (partial left-wall-plate-place -1 -1) -1 -1 oled-post  thumb-tl-place -1 0 web-post-tl)
-    (wall-brace  thumb-tl-place -1 0 web-post-tl thumb-tl-place -1 0 web-post-bl)
+    (wall-brace-xy (partial key-place 0 0) 0 1 web-post-tl  (partial left-wall-plate-place 1 1) 0 1 oled-post wall-xy-offset wall-xy-offset-thin)
+    (wall-brace-xy  (partial left-wall-plate-place 1 1) 0 1 oled-post  (partial left-wall-plate-place -1 1) 0 1 oled-post wall-xy-offset-thin wall-xy-offset-thin)
+    (wall-brace-xy  (partial left-wall-plate-place -1 1) 0 1 oled-post  (partial left-wall-plate-place -1 1) -1 0 oled-post wall-xy-offset-thin wall-xy-offset-thin)
+    (wall-brace-xy  (partial left-wall-plate-place -1 1) -1 0 oled-post  (partial left-wall-plate-place -1 -1) -1 -1 oled-post wall-xy-offset-thin wall-xy-offset-thin)
+    (wall-brace-xy (partial left-wall-plate-place -1 -1) -1 -1 oled-post  thumb-tl-place -1 0 web-post-tl wall-xy-offset-thin wall-xy-offset)
+    ;(wall-brace-xy  thumb-tl-place -1 0 web-post-tl thumb-tl-place -1 0 web-post-bl wall-xy-offset wall-xy-offset)
     ; front wall
     (key-wall-brace 3 lastrow   0 -1 web-post-bl 3 lastrow 0.5 -1 web-post-br)
     (key-wall-brace 3 lastrow 0.5 -1 web-post-br 4 cornerrow 0.5 -1 web-post-bl)
@@ -942,7 +951,7 @@
 (def controller-cutout-pos (map + [-21 19.0 0] [(first controller-ref) (second controller-ref) 2]))
 
 (def controller-holder-stl-pos
-  (add-vec controller-cutout-pos [-5.0 -32.9 -2.0]))
+  (add-vec controller-cutout-pos [-4.0 -35.6 -2.0]))
 
 (def controller-holder-stl
   (->> (import "controller holder.stl")
@@ -992,7 +1001,7 @@
 (defn screw-insert-all-shapes [bottom-radius top-radius height]
   (union 
          ; top left, near usb/trrs
-         (screw-insert 0 0         bottom-radius top-radius height [5.8 -4 0])
+         (screw-insert 0 0         bottom-radius top-radius height [6.5 -4 0])
          ; middle top
          (screw-insert 3 0         bottom-radius top-radius height [-9 -1 0])
          ; top right
@@ -1002,9 +1011,9 @@
          ; middle bottom
          (screw-insert 3 lastrow         bottom-radius top-radius height [-5 2 0])
          ; thumb cluster, closest to user
-         (screw-insert 1 lastrow         bottom-radius top-radius height [-2 -13 0])
+         (screw-insert 1 lastrow         bottom-radius top-radius height [-4 -13 0])
          ; thumb cluster left
-         (screw-insert 0 lastrow   bottom-radius top-radius height [19.5 -80 0])
+         (screw-insert 0 lastrow   bottom-radius top-radius height [11.5 -80 0])
 ))
 
 ; Hole Depth Y: 4.4
@@ -1239,8 +1248,9 @@
         (union
           model-right
           caps
+          (-% controller-holder-stl)
             ;(if (== bottom-cover 1) (->> model-plate-right))
-            (if (== wrist-rest-on 1) (->> wrist-rest-build 		)		)
+            ;(if (== wrist-rest-on 1) (->> wrist-rest-build))
           )
         )
       )
