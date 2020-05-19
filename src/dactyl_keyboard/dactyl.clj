@@ -204,7 +204,7 @@
                                 )
   )
 
-(def single-plate-side-nubs (if create-side-nubs
+(def single-plate-side-nubs (if create-side-nubs?
                               (union single-plate-side-nub (mirror [1 0 0] single-plate-side-nub))
                               
                               ))
