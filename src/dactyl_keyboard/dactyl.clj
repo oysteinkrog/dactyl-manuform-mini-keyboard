@@ -94,7 +94,7 @@
                                (= column 5) [0 -11 4.64]            ; original [0 -5.8 5.64]
                                :else [0 0 0]))
 
-(def thumb-offsets [4 -3 7])
+(def thumb-offsets [4 -4 7])
 
 (def keyboard-z-offset 14)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
@@ -517,39 +517,39 @@
 ;top top right
 (defn thumb-ttr-place [shape]
   (->> shape
-       (rd 3 -2 7)
+       (rd 7 -6 12)
        (translate thumborigin)
-       (translate [3 -5 6])))
+       (translate [1 -3.5 6])))
 ;top right
 (defn thumb-tr-place [shape]
   (->> shape
-       (rd 7 -8 13)
+       (rd 7 -8 14)
        (translate thumborigin)
-       (translate [-16 -8 4]))) ; original 1.5u  (translate [-12 -16 3])
+       (translate [-17 -8 4]))) ; original 1.5u  (translate [-12 -16 3])
 ;top middle
 (defn thumb-tm-place [shape]
   (->> shape
-       (rd 8 -23 19)
+       (rd 8 -10 16)
        (translate thumborigin)
-       (translate [-33.5 -13 -0.5]))) ; original 1.5u (translate [-32 -15 -2])))
+       (translate [-34.5 -13 0.5]))) ; original 1.5u (translate [-32 -15 -2])))
 ; top left
 (defn thumb-tl-place [shape]
   (->> shape
-       (rd 9 -32 23)
+       (rd 9 -6 17)
        (translate thumborigin)
-       (translate [-48 -21 -9]))) ;        (translate [-50 -25 -12])))
+       (translate [-54 -15 -2]))) ;        (translate [-50 -25 -12])))
 ; bottom right
 (defn thumb-br-place [shape]
   (->> shape
-       (rd 10 -25 22)
+       (rd 0 -10 16)
        (translate thumborigin)
-       (translate [-24 -32 -4])))
+       (translate [-28 -34 0])))
 ; bottom left
 (defn thumb-bl-place [shape]
   (->> shape
-       (rd 10 -34 24)
+       (rd 0 -5 17)
        (translate thumborigin)
-       (translate [-39 -38 -13])))
+       (translate [-48 -34 -3])))
 
 
 (defn thumb-1x-layout [shape]
