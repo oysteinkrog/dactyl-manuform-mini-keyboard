@@ -524,37 +524,38 @@
 ;top right
 (defn thumb-tr-place [shape]
   (->> shape
-       (rd 7 -8 14)
+       (rd 7 -8 13)
        (translate thumborigin)
-       (translate [-17 -8 4]))) ; original 1.5u  (translate [-12 -16 3])
+       (translate [-17.2 -7 4]))) ; original 1.5u  (translate [-12 -16 3])
 ;top middle
 (defn thumb-tm-place [shape]
   (->> shape
-       (rd 8 -10 16)
+       (rd 8 -10 14)
        (translate thumborigin)
-       (translate [-34.5 -13 0.5]))) ; original 1.5u (translate [-32 -15 -2])))
+       (translate [-35 -12 1.5]))) ; original 1.5u (translate [-32 -15 -2])))
 ; top left
 (defn thumb-tl-place [shape]
   (->> shape
-       (rd 9 -6 17)
+       (rd 9 -6 15)
        (translate thumborigin)
-       (translate [-54 -15 -2]))) ;        (translate [-50 -25 -12])))
+       (translate [-54 -15 -1]))) ;        (translate [-50 -25 -12])))
 ; bottom right
 (defn thumb-br-place [shape]
   (->> shape
-       (rd 0 -10 16)
+       (rd 5 -10 14)
        (translate thumborigin)
-       (translate [-28 -34 0])))
+       (translate [-29.5 -32.5 -1.5])))
 ; bottom left
 (defn thumb-bl-place [shape]
   (->> shape
-       (rd 0 -5 17)
+       (rd 5 -5 15)
        (translate thumborigin)
-       (translate [-48 -34 -3])))
+       (translate [-49.5 -33.5 -4])))
 
 
 (defn thumb-1x-layout [shape]
   (union
+   (thumb-ttr-place shape)
    (thumb-tl-place shape)
    (thumb-br-place shape)
    (thumb-bl-place shape)
@@ -562,7 +563,6 @@
 
 (defn thumb-15x-layout [shape]
   (union
-   (thumb-ttr-place shape)
    (thumb-tr-place shape)
    (thumb-tm-place shape)
    ))
@@ -889,14 +889,13 @@
 
       (thumb-tl-place web-post-tl)
       (thumb-tl-place web-post-tr)
-
-      (thumb-tm-place web-post-tl)
-
-      (thumb-tm-place web-post-tl)
-      (thumb-tl-place web-post-tl)
       (key-place 0 2 web-post-tl)
 
       (key-place 0 2 web-post-tl)
+      (key-place 0 2 web-post-bl)
+      (thumb-tl-place web-post-tr)
+
+      (thumb-tl-place web-post-tr)
       (key-place 0 2 web-post-bl)
       (thumb-tm-place web-post-tl)
       )))
@@ -1001,7 +1000,7 @@
 (defn screw-insert-all-shapes [bottom-radius top-radius height]
   (union 
          ; top left, near usb/trrs
-         (screw-insert 0 0         bottom-radius top-radius height [6.5 -4 0])
+         (screw-insert 0 0         bottom-radius top-radius height [7.0 -4 0])
          ; middle top
          (screw-insert 3 0         bottom-radius top-radius height [-9 -1 0])
          ; top right
@@ -1011,7 +1010,7 @@
          ; middle bottom
          (screw-insert 3 lastrow         bottom-radius top-radius height [-5 2 0])
          ; thumb cluster, closest to user
-         (screw-insert 1 lastrow         bottom-radius top-radius height [-4 -13 0])
+         (screw-insert 1 lastrow         bottom-radius top-radius height [-5 -13 0])
          ; thumb cluster left
          (screw-insert 0 lastrow   bottom-radius top-radius height [11.5 -80 0])
 ))
@@ -1020,8 +1019,8 @@
 (def screw-insert-height 3.5)
 
 ; Hole Diameter C: 4.1-4.4
-(def screw-insert-bottom-radius (/ 4.0 2))
-(def screw-insert-top-radius (/ 4.0 2))
+(def screw-insert-bottom-radius 1.9)
+(def screw-insert-top-radius 1.9)
 (def screw-insert-holes  (screw-insert-all-shapes screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
 
 (def screw-radius (/ 2.5 2))
@@ -1124,22 +1123,22 @@
 (def rest-case-cuts
   (union
     ;;right cut
-    (->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x 24 4.5]))
-    (->> (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x (+ 33.8 nrows) 4.5]))
+    (->> (cylinder 1.85 50)(with-fn 30) (rdx 90)(translate [right_wrist_connecter_x 24 4.5]))
+    (->> (cylinder 2.8 5.2)(with-fn 50) (rdx 90)(translate [right_wrist_connecter_x (+ 38.8 nrows) 4.5]))
     (->> (cube 6 3 12.2)(translate [right_wrist_connecter_x (+ 21 nrows) 1.5]));;39
     ;;middle cut
-    (->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x 14 4.5]))
-    (->> (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [middle_wrist_connecter_x 20 4.5]))
+    (->> (cylinder 1.85 50)(with-fn 30) (rdx 90)(translate [middle_wrist_connecter_x 14 4.5]))
+    (->> (cylinder 2.8 5.2)(with-fn 50) (rdx 90)(translate [middle_wrist_connecter_x 38 4.5]))
     (->> (cube 6 3 12.2)(translate [middle_wrist_connecter_x (+ 17 nrows) 1.5]))
     ;;left
-    (->> (cylinder 1.85 50)(with-fn 30) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x 11 4.5]))
-    (->> (cylinder 2.8 5.2)(with-fn 50) (rotate  (/  π 2)  [1 0 0])(translate [left_wrist_connecter_x (+ 17.25 nrows) 4.5]))
+    (->> (cylinder 1.85 50)(with-fn 30) (rdx 90)(translate [left_wrist_connecter_x 20 4.5]))
+    (->> (cylinder 2.8 5.2)(with-fn 50) (rdx 90)(translate [left_wrist_connecter_x (+ 38.25 nrows) 4.5]))
     (->> (cube 6 3 12.2)(translate [left_wrist_connecter_x (+ 20.0 nrows) 1.5]))
     )
   )
 
 (def rest-case-connectors
-  (ty 10
+  (ty 20
       (difference
         (union
           (scale [1 1 1.6] (->> (cylinder 6 37)(with-fn 200) (rotate  (/  π 2)  [1 0 0])(translate [right_wrist_connecter_x 5 0])));;right
@@ -1249,8 +1248,11 @@
           model-right
           caps
           (-% controller-holder-stl)
+          ;(import "C:/Users/Øystein/Pictures/Scans/Scan_20200519.svg", center=true);
+          ;translate ([67,50,0]) linear_extrude (.4) import ("F:/3DPRINTING/KEYBOARDS/dactyl-manuform/dactyl-manuform-mini-keyboard/data/scan_wristrest_1.svg", center=true);
             ;(if (== bottom-cover 1) (->> model-plate-right))
-            ;(if (== wrist-rest-on 1) (->> wrist-rest-build))
+            wrist-rest-build
+          ;(if (== wrist-rest-on 1) (->> wrist-rest-build)
           )
         )
       )
