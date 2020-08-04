@@ -532,7 +532,7 @@
   (->> shape
        (rd 8 -10 14)
        (translate thumborigin)
-       (translate [-35 -12 1.5]))) ; original 1.5u (translate [-32 -15 -2])))
+       (translate [-35.2 -11 1.5]))) ; original 1.5u (translate [-32 -15 -2])))
 ; top left
 (defn thumb-tl-place [shape]
   (->> shape
@@ -544,13 +544,13 @@
   (->> shape
        (rd 5 -10 14)
        (translate thumborigin)
-       (translate [-29.5 -32.5 -1.5])))
+       (translate [-29.9 -31.0 -3.5])))
 ; bottom left
 (defn thumb-bl-place [shape]
   (->> shape
        (rd 5 -5 15)
        (translate thumborigin)
-       (translate [-49.5 -33.5 -4])))
+       (translate [-49.5 -33.5 -7])))
 
 
 (defn thumb-1x-layout [shape]
@@ -1010,7 +1010,7 @@
          ; middle bottom
          (screw-insert 3 lastrow         bottom-radius top-radius height [-5 2 0])
          ; thumb cluster, closest to user
-         (screw-insert 1 lastrow         bottom-radius top-radius height [-5 -13 0])
+         (screw-insert 1 lastrow         bottom-radius top-radius height [-7 -13 0])
          ; thumb cluster left
          (screw-insert 0 lastrow   bottom-radius top-radius height [11.5 -80 0])
 ))
