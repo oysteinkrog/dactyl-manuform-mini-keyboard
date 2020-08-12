@@ -952,9 +952,10 @@
 (def controller-holder-stl-pos
   (add-vec controller-cutout-pos [-4.0 -35.6 -2.0]))
 
-(def controller-holder-stl
-  (->> (import "controller holder.stl")
-     ;(scale [0.97 0.97 1])
+(def controller-holder-stl (import "controller holder.stl"))
+
+(defn place-controller-holder [shape]
+  (->> shape
      (rotate (deg2rad 90) [1 0 0])
      (rotate oled-mount-rotation-z [0 0 1])
      (translate controller-holder-stl-pos)
@@ -968,7 +969,11 @@
        )
   )
 
-(defn controller-cutout [shape] (intersect-bottom controller-holder-stl shape 19))
+(defn controller-cutout [shape] (intersect-bottom 
+                                  (ty -0.8 (place-controller-holder
+                                    (scale [1.02 1.02 1.02]
+                                     controller-holder-stl)))
+                                  shape 19.5))
 
 (def encoder-pos (add-vec (left-wall-plate-position 0 -1) [0 -13 0]))
 (def encoder-rot-x oled-mount-rotation-x)
@@ -1235,7 +1240,7 @@
       (write-scad
         (union 
           model-right
-          (-% controller-holder-stl)
+          (-% (place-controller-holder controller-holder-stl))
           )
         ))
 
@@ -1247,7 +1252,7 @@
         (union
           model-right
           caps
-          (-% controller-holder-stl)
+          (-% (place-controller-holder controller-holder-stl))
           ;(import "C:/Users/Øystein/Pictures/Scans/Scan_20200519.svg", center=true);
           ;translate ([67,50,0]) linear_extrude (.4) import ("F:/3DPRINTING/KEYBOARDS/dactyl-manuform/dactyl-manuform-mini-keyboard/data/scan_wristrest_1.svg", center=true);
             ;(if (== bottom-cover 1) (->> model-plate-right))
