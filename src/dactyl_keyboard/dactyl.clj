@@ -808,7 +808,7 @@
       [(* mount-width -0.5) (* mount-width 0.5) 0]
       [(* oled-holder-width -0.5) (* oled-holder-height -0.5) 0]
       [(* xdir oled-holder-width 0.5) (* ydir oled-holder-height 0.5) 0]
-      [-3 6 -7]
+      [-3 6.5 -7]
       )
     )
   )
@@ -950,7 +950,7 @@
 (def controller-cutout-pos (map + [-21 19.0 0] [(first controller-ref) (second controller-ref) 2]))
 
 (def controller-holder-stl-pos
-  (add-vec controller-cutout-pos [-4.0 -35.6 -2.0]))
+  (add-vec controller-cutout-pos [-4.0 -36.0 -2.0]))
 
 (def controller-holder-stl (import "controller holder.stl"))
 
@@ -969,8 +969,8 @@
        )
   )
 
-(defn controller-cutout [shape] (intersect-bottom 
-                                  (ty -0.8 (place-controller-holder
+(defn controller-cutout [shape] (intersect-bottom
+                                  (ty -0.9 (place-controller-holder
                                     (scale [1.02 1.02 1.02]
                                      controller-holder-stl)))
                                   shape 19.5))
