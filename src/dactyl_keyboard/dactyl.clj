@@ -544,13 +544,13 @@
   (->> shape
        (rd 5 -10 14)
        (translate thumborigin)
-       (translate [-29.9 -31.0 -3.5])))
+       (translate [-29.9 -31.0 -2.5])))
 ; bottom left
 (defn thumb-bl-place [shape]
   (->> shape
        (rd 5 -5 15)
        (translate thumborigin)
-       (translate [-49.5 -33.5 -7])))
+       (translate [-49.5 -33.5 -5])))
 
 
 (defn thumb-1x-layout [shape]
