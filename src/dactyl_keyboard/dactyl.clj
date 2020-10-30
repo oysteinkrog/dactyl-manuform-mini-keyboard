@@ -81,8 +81,8 @@
 (def α (/ π 10))                        ; curvature of the columns
 (def β (/ π 36))                        ; curvature of the rows
 (def centerrow (- nrows 2.4))             ; controls front-back tilt
-(def centercol 1)                       ; controls left-right tilt / tenting (higher number is more tenting)
-(def tenting-angle (/ π 12))            ; or, change this for more precise tenting control
+(def centercol 2)                       ; controls left-right tilt / tenting (higher number is more tenting)
+(def tenting-angle (/ π 11))            ; or, change this for more precise tenting control
 (def column-style
   (if (> nrows 5) :orthographic :standard))  ; options include :standard, :orthographic, and :fixed
 ; (def column-style :fixed)
@@ -94,15 +94,15 @@
                                (= column 5) [0 -13 4.64]            ; original [0 -5.8 5.64]
                                :else [0 0 0]))
 
-(def thumb-offsets [4 -4 7])
+(def thumb-offsets [4 -4 8])
 
-(def keyboard-z-offset 14)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
+(def keyboard-z-offset 12)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
 (def extra-width 2.2)                   ; extra space between the base of keys; original= 2
 (def extra-height 1.1)                  ; original= 0.5
 
 (def wall-z-offset -4)                 ; original=-15 length of the first downward-sloping part of the wall (negative)
-(def wall-xy-offset 3)                  ; offset in the x and/or y direction for the first downward-sloping part of the wall (negative)
+(def wall-xy-offset 4)                  ; offset in the x and/or y direction for the first downward-sloping part of the wall (negative)
 (def wall-xy-offset-thin 1)                  ; offset in the x and/or y direction for the first downward-sloping part of the wall (negative)
 (def wall-thickness 3)                  ; wall thickness parameter; originally 5
 
@@ -518,39 +518,39 @@
 ;top top right
 (defn thumb-ttr-place [shape]
   (->> shape
-       (rd 7 -6 12)
+       (rd 8.5 -7 10)
        (translate thumborigin)
-       (translate [1 -3.5 6])))
+       (translate [1.5 -5.5 6.5])))
 ;top right
 (defn thumb-tr-place [shape]
   (->> shape
-       (rd 7 -8 13)
+       (rd 7 -6 11)
        (translate thumborigin)
-       (translate [-17.2 -7 4]))) ; original 1.5u  (translate [-12 -16 3])
+       (translate [-17.2 -7 5]))) ; original 1.5u  (translate [-12 -16 3])
 ;top middle
 (defn thumb-tm-place [shape]
   (->> shape
-       (rd 8 -10 14)
+       (rd 6 -5 12)
        (translate thumborigin)
-       (translate [-35.2 -11 1.5]))) ; original 1.5u (translate [-32 -15 -2])))
+       (translate [-36.0 -9 3.2]))) ; original 1.5u (translate [-32 -15 -2])))
 ; top left
 (defn thumb-tl-place [shape]
   (->> shape
-       (rd 9 -6 15)
+       (rd 9 -3 13)
        (translate thumborigin)
-       (translate [-54 -15 -1]))) ;        (translate [-50 -25 -12])))
+       (translate [-55 -11 2]))) ;        (translate [-50 -25 -12])))
 ; bottom right
 (defn thumb-br-place [shape]
   (->> shape
-       (rd 5 -10 14)
+       (rd 5 -5 12)
        (translate thumborigin)
-       (translate [-29.9 -31.0 -2.5])))
+       (translate [-31.3 -29.0 -1.0])))
 ; bottom left
 (defn thumb-bl-place [shape]
   (->> shape
-       (rd 5 -5 15)
+       (rd 5 -3 13)
        (translate thumborigin)
-       (translate [-49.5 -33.5 -5])))
+       (translate [-50.7 -29.5 -2])))
 
 
 (defn thumb-1x-layout [shape]
@@ -808,7 +808,7 @@
       [(* mount-width -0.5) (* mount-width 0.5) 0]
       [(* oled-holder-width -0.5) (* oled-holder-height -0.5) 0]
       [(* xdir oled-holder-width 0.5) (* ydir oled-holder-height 0.5) 0]
-      [-3 6.5 -7]
+      [-3 8.5 -7]
       )
     )
   )
@@ -950,7 +950,7 @@
 (def controller-cutout-pos (map + [-21 19.0 0] [(first controller-ref) (second controller-ref) 2]))
 
 (def controller-holder-stl-pos
-  (add-vec controller-cutout-pos [-4.0 -36.0 -2.0]))
+  (add-vec controller-cutout-pos [-5.0 -33.2 -2.0]))
 
 (def controller-holder-stl (import "controller holder.stl"))
 
@@ -973,7 +973,7 @@
                                   (ty -0.9 (place-controller-holder
                                     (scale [1.02 1.02 1.02]
                                      controller-holder-stl)))
-                                  shape 19.5))
+                                  shape 19.7))
 
 (def encoder-pos (add-vec (left-wall-plate-position 0 -1) [0 -13 0]))
 (def encoder-rot-x oled-mount-rotation-x)
@@ -1005,27 +1005,31 @@
 (defn screw-insert-all-shapes [bottom-radius top-radius height]
   (union 
          ; top left, near usb/trrs
-         (screw-insert 0 0         bottom-radius top-radius height [7.0 -4 0])
+         (screw-insert 0 0         bottom-radius top-radius height [9.0 -25 0])
          ; middle top
-         (screw-insert 3 0         bottom-radius top-radius height [-9 -1 0])
+         (screw-insert 1 0         bottom-radius top-radius height [-15 -3 0])
+         ; middle top
+         (screw-insert 3 0         bottom-radius top-radius height [-9 -2 0])
          ; top right
          (screw-insert lastcol 0         bottom-radius top-radius height [-4 7 0])
          ; lower right
          (screw-insert lastcol lastrow  bottom-radius top-radius height [-4 14 0])
          ; middle bottom
-         (screw-insert 3 lastrow         bottom-radius top-radius height [-5 2 0])
-         ; thumb cluster, closest to user
-         (screw-insert 1 lastrow         bottom-radius top-radius height [-7 -13 0])
+         (screw-insert 3 lastrow         bottom-radius top-radius height [-5 3 0])
+         ; thumb cluster, closest to user, left
+         (screw-insert 1 lastrow         bottom-radius top-radius height [-47 -20 0])
+         ; thumb cluster, closest to user, right
+         (screw-insert 1 lastrow         bottom-radius top-radius height [-10 -13 0])
          ; thumb cluster left
-         (screw-insert 0 lastrow   bottom-radius top-radius height [11.5 -80 0])
+         (screw-insert 0 lastrow   bottom-radius top-radius height [9.5 -80 0])
 ))
 
 ; Hole Depth Y: 4.4
 (def screw-insert-height 3.5)
 
 ; Hole Diameter C: 4.1-4.4
-(def screw-insert-bottom-radius 1.9)
-(def screw-insert-top-radius 1.9)
+(def screw-insert-bottom-radius 1.8)
+(def screw-insert-top-radius 1.8)
 (def screw-insert-holes  (screw-insert-all-shapes screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
 
 (def screw-radius (/ 2.5 2))
