@@ -161,7 +161,7 @@
 (def sa-profile-key-height 7.39)
 
 (def plate-thickness 3)
-(def bottom-thickness (* 0.2 8)) ; 8 0.2mm layers
+(def bottom-thickness (* 0.2 12)) ; 12*0.2mm layers
 (def mount-padding 1.5)
 (def side-nub-thickness 3.0)
 (def side-nub-size [(+ mount-padding 0.8) 3 side-nub-thickness])
@@ -986,57 +986,67 @@
 
 (defn screw-insert-shape [bottom-radius top-radius height]
   (union
-   (->> (binding [*fn* 30]
-          (cylinder [bottom-radius top-radius] height)))
-   (translate [0 0 (/ height 2)] (->> (binding [*fn* 30] (sphere top-radius))))))
+    (->> (binding [*fn* 30]
+           (tz (/ height 2)
+               (cylinder [bottom-radius top-radius] height))))
+    (translate [0 0 height] (->> (binding [*fn* 30] (sphere top-radius))))))
 
-(defn screw-insert [column row bottom-radius top-radius height offset]
+(defn screw-countersink-shape [screw-radius height countersink-radius countersink-height]
+  (union
+    (->> (binding [*fn* 30]
+           (tz (/ height 2)
+               (cylinder screw-radius height))))
+    (->> (binding [*fn* 30]
+           (tz (/ countersink-height -2)
+               (cylinder [(+ countersink-radius 0.5) screw-radius] (+ countersink-height 0.5)))))
+    )
+  )
+
+; Hole Depth Y: 4.4
+(def screw-insert-height 3.5)
+
+(defn screw-insert [column row shape offset]
   (let [shift-right   (= column lastcol)
         shift-left    (= column 0)
         shift-up      (and (not (or shift-right shift-left)) (= row 0))
         shift-down    (and (not (or shift-right shift-left)) (>= row lastrow))
         position      (if shift-up     (key-position column row (map + (wall-locate2  0  1) [0 (/ mount-height 2) 0]))
-                          (if shift-down  (key-position column row (map - (wall-locate2  0 -1) [0 (/ mount-height 2) 0]))
-                              (if shift-left (map + (left-wall-plate-position -1 1) (wall-locate3 -1 0))
-                                  (key-position column row (map + (wall-locate2  1  0) [(/ mount-width 2) 0 0])))))]
-    (->> (screw-insert-shape bottom-radius top-radius height)
-         (translate (map + offset [(first position) (second position) (/ height 2)])))))
+                      (if shift-down  (key-position column row (map - (wall-locate2  0 -1) [0 (/ mount-height 2) 0]))
+                      (if shift-left (map + (left-wall-plate-position -1 1) (wall-locate3 -1 0))
+                       (key-position column row (map + (wall-locate2  1  0) [(/ mount-width 2) 0 0])))))]
+    (translate (add-vec offset [(first position) (second position) 0]) shape)))
 
-(defn screw-insert-all-shapes [bottom-radius top-radius height]
+(defn screw-insert-all-shapes [shape]
   (union 
          ; top left, near usb/trrs
-         (screw-insert 0 0         bottom-radius top-radius height [9.0 -25 0])
+         (screw-insert 0 0        shape [9.0 -25 0])
          ; middle top
-         (screw-insert 1 0         bottom-radius top-radius height [-15 -3 0])
+         (screw-insert 1 0        shape [-15 -3 0])
          ; middle top
-         (screw-insert 3 0         bottom-radius top-radius height [-9 -2 0])
+         (screw-insert 3 0        shape [-9 -2 0])
          ; top right
-         (screw-insert lastcol 0         bottom-radius top-radius height [-4 7 0])
+         (screw-insert lastcol 0  shape [-4 7 0])
          ; lower right
-         (screw-insert lastcol lastrow  bottom-radius top-radius height [-4 14 0])
+         (screw-insert lastcol lastrow  shape [-4 14 0])
          ; middle bottom
-         (screw-insert 3 lastrow         bottom-radius top-radius height [-5 3 0])
+         (screw-insert 3 lastrow         shape [-5 3 0])
          ; thumb cluster, closest to user, left
-         (screw-insert 1 lastrow         bottom-radius top-radius height [-47 -20 0])
+         (screw-insert 1 lastrow         shape [-47 -20 0])
          ; thumb cluster, closest to user, right
-         (screw-insert 1 lastrow         bottom-radius top-radius height [-10 -13 0])
+         (screw-insert 1 lastrow         shape [-10 -13 0])
          ; thumb cluster left
-         (screw-insert 0 lastrow   bottom-radius top-radius height [9.5 -80 0])
+         (screw-insert 0 lastrow   shape [9.5 -80 0])
 ))
 
-; Hole Depth Y: 4.4
-(def screw-insert-height 3.5)
-
-; Hole Diameter C: 4.1-4.4
+; for threaded insert
 (def screw-insert-bottom-radius 1.8)
 (def screw-insert-top-radius 1.8)
-(def screw-insert-holes  (screw-insert-all-shapes screw-insert-bottom-radius screw-insert-top-radius screw-insert-height))
+(def screw-insert-holes (screw-insert-all-shapes (screw-insert-shape screw-insert-bottom-radius screw-insert-top-radius screw-insert-height)))
+(def screw-insert-outers (screw-insert-all-shapes (screw-insert-shape (+ screw-insert-bottom-radius 1.65) (+ screw-insert-top-radius 1.65) (+ screw-insert-height 1.5))))
 
+; cut for plate
 (def screw-radius (/ 2.5 2))
-(def screw-holes  (screw-insert-all-shapes screw-radius screw-radius screw-insert-height))
-
-; Wall Thickness W:\t1.65
-(def screw-insert-outers (screw-insert-all-shapes (+ screw-insert-bottom-radius 1.65) (+ screw-insert-top-radius 1.65) (+ screw-insert-height 1.5)))
+(def screw-holes-cut  (screw-insert-all-shapes (screw-countersink-shape screw-radius 5 (/ 5.54 2) 1.86)))
 
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 ;;;;;;;;;Wrist rest;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1215,7 +1225,7 @@
         case-walls-with-screws
         )
       )
-    (tz -0.1 screw-holes)
+    (tz 2 screw-holes-cut)
     ))
 
 
