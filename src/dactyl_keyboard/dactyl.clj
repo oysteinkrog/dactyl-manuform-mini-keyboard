@@ -120,7 +120,7 @@
 ;;;;;;;;;Wrist rest;;;;;;;;;;
 ;@@@@@@@@@@@@@@@@@@@@@@@@@@
 (def wrist-rest-on 1) 						;;0 for no rest 1 for a rest connection cut out in bottom case
-(def wrist-rest-back-height 18)				;;height of the back of the wrist rest--Default 34
+(def wrist-rest-back-height 23)				;;height of the back of the wrist rest--Default 34
 (def wrist-rest-angle -1) 			        ;;angle of the wrist rest--Default 20
 (def wrist-rest-rotation-angle 4)			;;0 default The angle in counter clockwise the wrist rest is at
 (def wrist-rest-ledge 3.5)					;;The height of ledge the silicone wrist rest fits inside
