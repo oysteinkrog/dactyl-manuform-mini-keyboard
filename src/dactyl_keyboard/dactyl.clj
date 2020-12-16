@@ -82,7 +82,7 @@
 (def β (/ π 36))                        ; curvature of the rows
 (def centerrow (- nrows 2.4))             ; controls front-back tilt
 (def centercol 2)                       ; controls left-right tilt / tenting (higher number is more tenting)
-(def tenting-angle (/ π 11))            ; or, change this for more precise tenting control
+(def tenting-angle (/ π 9))            ; or, change this for more precise tenting control
 (def column-style
   (if (> nrows 5) :orthographic :standard))  ; options include :standard, :orthographic, and :fixed
 ; (def column-style :fixed)
@@ -96,7 +96,7 @@
 
 (def thumb-offsets [4 -4 8])
 
-(def keyboard-z-offset 12)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
+(def keyboard-z-offset 16)               ; controls overall height; original=9 with centercol=3; use 16 for centercol=2
 
 (def extra-width 2.2)                   ; extra space between the base of keys; original= 2
 (def extra-height 1.1)                  ; original= 0.5
@@ -808,7 +808,7 @@
       [(* mount-width -0.5) (* mount-width 0.5) 0]
       [(* oled-holder-width -0.5) (* oled-holder-height -0.5) 0]
       [(* xdir oled-holder-width 0.5) (* ydir oled-holder-height 0.5) 0]
-      [-3 8.5 -7]
+      [-3 7 -7]
       )
     )
   )
@@ -950,7 +950,7 @@
 (def controller-cutout-pos (map + [-21 19.0 0] [(first controller-ref) (second controller-ref) 2]))
 
 (def controller-holder-stl-pos
-  (add-vec controller-cutout-pos [-5.0 -33.2 -2.0]))
+  (add-vec controller-cutout-pos [-5.0 -36.2 -2.0]))
 
 (def controller-holder-stl (import "controller holder.stl"))
 
