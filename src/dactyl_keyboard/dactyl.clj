@@ -132,7 +132,7 @@
 (def right_wrist_connecter_x   (if (== ncols 5) 13 25))
 (def middle_wrist_connecter_x   (if (== ncols 5) -5 0))
 (def left_wrist_connecter_x   (if (== ncols 5) -25 -25))
-(def wrist_brse_position [3 -23 0])
+(def wrist_brse_position [0 -23 0])
 
 ;;;;;;;;;;;;;;;;;;;;;;;
 ;; General variables ;;

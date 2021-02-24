@@ -11,7 +11,7 @@ this thumb layout w/earlier tenting would be nice.
 lower arm wrist rests (pivoting design from aliexpress) has reduced need for wrist rests
 
 
-beta-1: 
+beta-1:
 rotated wrist rests are not working out.
 screen is working ok, but not using much.
 rotary knobs also ok, but also not using much.
